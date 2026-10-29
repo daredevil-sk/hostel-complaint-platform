@@ -42,14 +42,16 @@ def render_login():
     with st.expander("🎭 Demo accounts (for presentation)"):
         st.markdown(
             """
-            | Role | Email | Password |
-            |------|-------|----------|
-            | Student | student1@demo.teamr | demo1234 |
-            | Student | student2@demo.teamr | demo1234 |
+            | Role / Hostel | Email | Password |
+            |---------------|-------|----------|
+            | Student (Asima - Girls) | student1@demo.teamr | demo1234 |
+            | Student (Aryabhatta C - Girls) | student2@demo.teamr | demo1234 |
+            | Student (Kalam - Boys) | student3@demo.teamr | demo1234 |
+            | Student (CV Raman - Boys) | student4@demo.teamr | demo1234 |
             | Caretaker | caretaker@demo.teamr | demo1234 |
             | Admin | admin@demo.teamr | demo1234 |
 
-            > ⚠️ These are fictional demo accounts, not real IIT Patna staff.
+            > ⚠️ These are fictional demo accounts, not real IIT Patna staff or students.
             """
         )
 
@@ -67,9 +69,8 @@ def render_register():
         email = st.text_input("Email address")
         password = st.text_input("Password", type="password")
         password2 = st.text_input("Confirm password", type="password")
-        hostel = st.selectbox("Your hostel (optional)", ["", "Alaknanda", "Barak",
-            "Brahmaputra", "Ganga", "Godavari", "Kaveri", "Mahanadi",
-            "Narmada", "Saraswati", "Yamuna", "Other"])
+        hostel = st.selectbox("Your hostel (optional)", [
+            "", "Aryabhatta", "Asima", "Kalam", "CV Raman", "Other"])
         submitted = st.form_submit_button("Create Account", use_container_width=True,
                                           type="primary")
 

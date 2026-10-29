@@ -91,10 +91,10 @@ def seed():
         student1 = Profile(
             id=str(uuid.uuid4()),
             email="student1@demo.teamr",
-            display_name="Demo Student 1",
+            display_name="Pooja Sharma (Asima)",
             password_hash=hash_password("demo1234"),
             role=UserRole.student,
-            hostel="Ganga",
+            hostel="Asima",
             is_active=True,
             created_at=now - timedelta(days=20),
             updated_at=now - timedelta(days=20),
@@ -102,10 +102,10 @@ def seed():
         student2 = Profile(
             id=str(uuid.uuid4()),
             email="student2@demo.teamr",
-            display_name="Demo Student 2",
+            display_name="Ananya Verma (Aryabhatta C)",
             password_hash=hash_password("demo1234"),
             role=UserRole.student,
-            hostel="Ganga",
+            hostel="Aryabhatta",
             is_active=True,
             created_at=now - timedelta(days=18),
             updated_at=now - timedelta(days=18),
@@ -113,15 +113,37 @@ def seed():
         student3 = Profile(
             id=str(uuid.uuid4()),
             email="student3@demo.teamr",
-            display_name="Demo Student 3",
+            display_name="Rahul Kumar (Kalam)",
             password_hash=hash_password("demo1234"),
             role=UserRole.student,
-            hostel="Barak",
+            hostel="Kalam",
             is_active=True,
             created_at=now - timedelta(days=10),
             updated_at=now - timedelta(days=10),
         )
-        for u in [admin, caretaker, student1, student2, student3]:
+        student4 = Profile(
+            id=str(uuid.uuid4()),
+            email="student4@demo.teamr",
+            display_name="Amit Singh (CV Raman)",
+            password_hash=hash_password("demo1234"),
+            role=UserRole.student,
+            hostel="CV Raman",
+            is_active=True,
+            created_at=now - timedelta(days=8),
+            updated_at=now - timedelta(days=8),
+        )
+        student5 = Profile(
+            id=str(uuid.uuid4()),
+            email="student5@demo.teamr",
+            display_name="Rohan Mehta (Aryabhatta A)",
+            password_hash=hash_password("demo1234"),
+            role=UserRole.student,
+            hostel="Aryabhatta",
+            is_active=True,
+            created_at=now - timedelta(days=7),
+            updated_at=now - timedelta(days=7),
+        )
+        for u in [admin, caretaker, student1, student2, student3, student4, student5]:
             db.add(u)
         db.flush()
 
@@ -167,21 +189,21 @@ def seed():
 
         c1 = make_complaint(
             "TR-2026-0001",
-            "Water cooler not working — Block B common area",
-            Category.water_supply, "Ganga", "Block B", "Ground",
+            "Water cooler not working — Kalam Block B common area",
+            Category.water_supply, "Kalam", "Block B", "Ground",
             "Near common room entrance",
-            DEMO_LABEL + "The water cooler in Block B common area has not been functioning "
+            DEMO_LABEL + "The water cooler in Kalam Block B common area has not been functioning "
             "for the past 5 days. Water is warm and the cooling unit makes a loud noise. "
             "This is a shared resource used by 40+ students.",
-            student1.id, ComplaintStatus.resolved, Priority.high, 10, vote_count=12,
+            student3.id, ComplaintStatus.resolved, Priority.high, 10, vote_count=12,
         )
 
         c2 = make_complaint(
             "TR-2026-0002",
-            "No water supply in 2nd floor washrooms — Block A",
-            Category.washroom, "Ganga", "Block A", "2nd",
-            "Washrooms 201–204",
-            DEMO_LABEL + "Water supply has been completely absent in all 2nd floor washrooms "
+            "No water supply in 2nd floor washrooms — Asima",
+            Category.washroom, "Asima", "Block A", "2nd",
+            "Washrooms 201–204 (Girls Wing)",
+            DEMO_LABEL + "Water supply has been completely absent in all 2nd floor washrooms in Asima "
             "since yesterday morning. Students are unable to use the facilities. "
             "This affects approximately 30 students.",
             student1.id, ComplaintStatus.in_progress, Priority.urgent, 5, vote_count=24,
@@ -189,20 +211,20 @@ def seed():
 
         c3 = make_complaint(
             "TR-2026-0003",
-            "Broken door hinge — Room 312",
-            Category.furniture, "Ganga", "Block C", "3rd",
-            "Room 312",
-            DEMO_LABEL + "The door hinge in room 312 is completely broken. The door cannot "
+            "Broken door hinge — Aryabhatta Block C Room 312",
+            Category.furniture, "Aryabhatta", "Block C", "3rd",
+            "Room 312 (Girls Wing)",
+            DEMO_LABEL + "The door hinge in Aryabhatta Block C room 312 is completely broken. The door cannot "
             "be properly closed or locked, creating a security and privacy concern.",
             student2.id, ComplaintStatus.acknowledged, Priority.medium, 3, vote_count=5,
         )
 
         c4 = make_complaint(
             "TR-2026-0004",
-            "Wi-Fi disconnecting repeatedly in Block D",
-            Category.internet, "Barak", "Block D", "All",
+            "Wi-Fi disconnecting repeatedly in Kalam Block D",
+            Category.internet, "Kalam", "Block D", "All",
             "Block D, all floors",
-            DEMO_LABEL + "Wi-Fi has been dropping every 10–15 minutes throughout Block D "
+            DEMO_LABEL + "Wi-Fi has been dropping every 10–15 minutes throughout Kalam Block D "
             "for the past week. Reconnecting temporarily fixes it but it drops again. "
             "This is severely affecting study and assignment submissions.",
             student3.id, ComplaintStatus.submitted, Priority.high, 1, vote_count=18,
@@ -210,36 +232,36 @@ def seed():
 
         c5 = make_complaint(
             "TR-2026-0005",
-            "Overflowing dustbins near mess entrance",
-            Category.cleaning, "Ganga", "Main Block", "Ground",
-            "Near mess entrance on east side",
-            DEMO_LABEL + "The dustbins near the mess entrance have been overflowing for "
+            "Overflowing dustbins near CV Raman mess entrance",
+            Category.cleaning, "CV Raman", "Main Block", "Ground",
+            "East walkway near mess entrance",
+            DEMO_LABEL + "The dustbins near CV Raman mess entrance have been overflowing for "
             "3 days. Garbage is spilling onto the walkway and attracting insects. "
             "This is a hygiene hazard.",
-            student2.id, ComplaintStatus.assigned, Priority.high, 2, vote_count=9,
+            student4.id, ComplaintStatus.assigned, Priority.high, 2, vote_count=9,
         )
 
         c6 = make_complaint(
             "TR-2026-0006",
-            "Flickering lights in corridor — Block A 3rd floor",
-            Category.electrical, "Ganga", "Block A", "3rd",
-            "Full corridor, 3rd floor",
-            DEMO_LABEL + "The corridor lights on Block A 3rd floor have been flickering "
+            "Flickering lights in corridor — Aryabhatta Block A 3rd floor",
+            Category.electrical, "Aryabhatta", "Block A", "3rd",
+            "Full corridor, 3rd floor (Boys Wing)",
+            DEMO_LABEL + "The corridor lights on Aryabhatta Block A 3rd floor have been flickering "
             "intermittently. At night the corridor is sometimes pitch dark, which is a "
             "safety concern.",
-            student1.id, ComplaintStatus.submitted, Priority.medium, 2, vote_count=7,
+            student5.id, ComplaintStatus.submitted, Priority.medium, 2, vote_count=7,
         )
 
         db.flush()
 
         # ─── Votes ────────────────────────────────────────────────────────────
         vote_data = [
-            (c1.id, student2.id), (c1.id, student3.id),
+            (c1.id, student1.id), (c1.id, student2.id), (c1.id, student4.id),
             (c2.id, student2.id), (c2.id, student3.id),
             (c3.id, student1.id),
-            (c4.id, student1.id), (c4.id, student2.id),
+            (c4.id, student1.id), (c4.id, student2.id), (c4.id, student5.id),
             (c5.id, student1.id), (c5.id, student3.id),
-            (c6.id, student2.id),
+            (c6.id, student3.id), (c6.id, student4.id),
         ]
         for cid, sid in vote_data:
             v = ComplaintVote(complaint_id=cid, student_id=sid,
@@ -401,9 +423,11 @@ def seed():
         print("─── Demo Accounts ───────────────────────────────────────")
         print("  Admin:      admin@demo.teamr      / demo1234")
         print("  Caretaker:  caretaker@demo.teamr  / demo1234")
-        print("  Student 1:  student1@demo.teamr   / demo1234")
-        print("  Student 2:  student2@demo.teamr   / demo1234")
-        print("  Student 3:  student3@demo.teamr   / demo1234")
+        print("  Student 1:  student1@demo.teamr   / demo1234  (Asima - Girls)")
+        print("  Student 2:  student2@demo.teamr   / demo1234  (Aryabhatta Block C - Girls)")
+        print("  Student 3:  student3@demo.teamr   / demo1234  (Kalam - Boys)")
+        print("  Student 4:  student4@demo.teamr   / demo1234  (CV Raman - Boys)")
+        print("  Student 5:  student5@demo.teamr   / demo1234  (Aryabhatta Block A - Boys)")
         print("─────────────────────────────────────────────────────────")
         print("⚠️  All users and complaints are fictional demo data.")
 

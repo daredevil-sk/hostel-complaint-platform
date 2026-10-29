@@ -15,8 +15,7 @@ from src.components.ui import (
 )
 import os
 
-HOSTELS = ["", "Alaknanda", "Barak", "Brahmaputra", "Ganga", "Godavari",
-           "Kaveri", "Mahanadi", "Narmada", "Saraswati", "Yamuna", "Other"]
+HOSTELS = ["", "Aryabhatta", "Asima", "Kalam", "CV Raman", "Other"]
 
 PAGE_SIZE = 10
 

@@ -12,8 +12,7 @@ from src.utils.complaints import create_complaint, save_attachment
 from src.components.ui import page_header, demo_banner
 import os
 
-HOSTELS = ["Alaknanda", "Barak", "Brahmaputra", "Ganga", "Godavari",
-           "Kaveri", "Mahanadi", "Narmada", "Saraswati", "Yamuna", "Other"]
+HOSTELS = ["Aryabhatta", "Asima", "Kalam", "CV Raman", "Other"]
 
 
 def render():
@@ -44,11 +43,12 @@ def render():
                                 [c.value for c in Category])
 
         st.markdown("### 📍 Location")
+        st.caption("Hostels: Asima (Girls) | Aryabhatta (Block C: Girls; Blocks A, B, D: Boys) | Kalam (Blocks A-D: Boys) | CV Raman (Boys)")
         c1, c2 = st.columns(2)
         with c1:
             hostel = st.selectbox("Hostel *", HOSTELS)
         with c2:
-            block = st.text_input("Block / Building", placeholder="e.g. Block A")
+            block = st.text_input("Block / Building", placeholder="e.g. Block A, Block B, Block C, Block D")
 
         c3, c4 = st.columns(2)
         with c3:
