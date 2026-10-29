@@ -1,0 +1,8 @@
+"""Sample CSV export for demonstration purposes."""
+complaint_number,title,category,hostel,block,floor,location_detail,status,priority,vote_count,is_seen,first_seen_at,acknowledged_at,created_at,updated_at,resolved_at
+TR-2026-0001,Water cooler not working — Block B common area,Water Supply,Ganga,Block B,Ground,Near common room entrance,Resolved,High,12,True,2026-10-21 08:30:00,2026-10-21 09:30:00,2026-10-20 10:00:00,2026-10-23 16:00:00,2026-10-23 16:00:00
+TR-2026-0002,No water supply in 2nd floor washrooms — Block A,Washroom & Hygiene,Ganga,Block A,2nd,Washrooms 201–204,In Progress,Urgent,24,True,2026-10-26 09:00:00,2026-10-26 09:40:00,2026-10-25 14:00:00,2026-10-27 09:30:00,
+TR-2026-0003,Broken door hinge — Room 312,Furniture & Fixtures,Ganga,Block C,3rd,Room 312,Acknowledged,Medium,5,True,2026-10-28 11:00:00,,2026-10-27 14:00:00,2026-10-28 11:00:00,
+TR-2026-0004,Wi-Fi disconnecting repeatedly in Block D,Internet & Wi-Fi,Barak,Block D,All,Block D all floors,Submitted,High,18,False,,,2026-10-29 08:00:00,2026-10-29 08:00:00,
+TR-2026-0005,Overflowing dustbins near mess entrance,Cleaning & Waste,Ganga,Main Block,Ground,Near mess entrance on east side,Assigned,High,9,False,,,2026-10-28 10:00:00,2026-10-29 07:00:00,
+TR-2026-0006,Flickering lights in corridor — Block A 3rd floor,Electrical,Ganga,Block A,3rd,Full corridor 3rd floor,Submitted,Medium,7,False,,,2026-10-28 09:00:00,2026-10-28 09:00:00,
