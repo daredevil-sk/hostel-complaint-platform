@@ -25,8 +25,15 @@ if hasattr(sys.stderr, "reconfigure"):
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("DATABASE_URL", "sqlite:///./hostel_complaints.db")
 
-from dotenv import load_dotenv
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    try:
+        from src.utils.env_loader import load_env
+        load_env()
+    except Exception:
+        pass
 
 from src.db.database import init_db, get_db, engine
 from src.db.models import (

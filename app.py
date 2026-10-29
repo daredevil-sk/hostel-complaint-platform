@@ -13,9 +13,14 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import streamlit as st
-from dotenv import load_dotenv
 
-load_dotenv()
+# Safe environment loading (works with or without python-dotenv)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    from src.utils.env_loader import load_env
+    load_env()
 
 # ─── Page config (must be first Streamlit call) ───────────────────────────────
 st.set_page_config(
