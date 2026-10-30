@@ -19,7 +19,29 @@ from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./hostel_complaints.db")
+def normalize_db_url(url: str) -> str:
+    """Normalize database URL for SQLAlchemy compatibility."""
+    if not url:
+        return url
+    url = url.strip()
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        # Auto-detect modern psycopg (v3) vs psycopg2
+        try:
+            import psycopg  # noqa: F401
+            return "postgresql+psycopg://" + url[len("postgresql://"):]
+        except ImportError:
+            try:
+                import psycopg2  # noqa: F401
+                return "postgresql+psycopg2://" + url[len("postgresql://"):]
+            except ImportError:
+                return url
+    return url
+
+
+RAW_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./hostel_complaints.db")
+DATABASE_URL = normalize_db_url(RAW_DATABASE_URL)
 
 # SQLite-specific settings for thread safety in Streamlit
 _connect_args = {}
