@@ -78,3 +78,29 @@ def init_db():
     """Create all tables defined in the models."""
     from src.db.models import Base  # noqa: F401 – import to register models
     Base.metadata.create_all(bind=engine)
+    _migrate_db()
+
+
+def _migrate_db():
+    """Apply incremental schema migrations for new columns."""
+    with engine.connect() as conn:
+        if DATABASE_URL.startswith("sqlite"):
+            try:
+                result = conn.execute(text("PRAGMA table_info(complaints)"))
+                cols = {row[1] for row in result}
+                if "is_anonymous" not in cols:
+                    conn.execute(text(
+                        "ALTER TABLE complaints ADD COLUMN is_anonymous BOOLEAN NOT NULL DEFAULT 0"
+                    ))
+                    conn.commit()
+            except Exception:
+                pass
+        else:
+            try:
+                conn.execute(text(
+                    "ALTER TABLE complaints ADD COLUMN IF NOT EXISTS "
+                    "is_anonymous BOOLEAN NOT NULL DEFAULT FALSE"
+                ))
+                conn.commit()
+            except Exception:
+                pass

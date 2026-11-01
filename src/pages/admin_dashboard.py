@@ -15,7 +15,7 @@ from src.utils.complaints import (
     get_seen_status, get_audit_logs, export_complaints_csv,
 )
 from src.components.ui import (
-    empty_state, page_header, status_badge, priority_badge, fmt_dt,
+    empty_state, page_header, status_badge, priority_badge, fmt_dt, back_button,
 )
 
 
@@ -25,11 +25,12 @@ def render():
     db = get_db()
 
     try:
-        page_header("⚙️ Admin Dashboard", "Manage complaints, users, and platform operations")
+        back_button("Home", "home", "admin_back")
+        page_header("Admin Dashboard", "Manage complaints, users, and platform operations")
 
         tabs = st.tabs([
-            "📊 Overview", "📋 All Complaints", "👷 Assignments",
-            "🔀 Merge Duplicates", "👥 User Management", "📜 Audit Log",
+            "Overview", "All Complaints", "Assignments",
+            "Merge Duplicates", "User Management", "Audit Log",
         ])
 
         with tabs[0]:

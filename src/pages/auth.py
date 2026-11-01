@@ -5,7 +5,7 @@ Login and registration pages.
 import streamlit as st
 from src.utils.auth import login, register, is_logged_in
 from src.db.models import UserRole
-from src.components.ui import page_header
+from src.components.ui import page_header, back_button
 
 
 def render_login():
@@ -13,7 +13,8 @@ def render_login():
         st.session_state["page"] = "home"
         st.rerun()
 
-    page_header("🔑 Sign In", "Welcome back to Team R")
+    back_button("Home", "home", "login_back")
+    page_header("Sign In", "Welcome back")
 
     with st.form("login_form"):
         email = st.text_input("Email address")
@@ -34,12 +35,12 @@ def render_login():
 
     st.markdown("---")
     st.markdown("Don't have an account?")
-    if st.button("📝 Create a student account"):
+    if st.button("Create a student account", use_container_width=True):
         st.session_state["page"] = "register"
         st.rerun()
 
-    # Demo accounts hint
-    with st.expander("🎭 Demo accounts (for presentation)"):
+    # Demo accounts
+    with st.expander("Demo accounts (for testing)"):
         st.markdown(
             """
             | Role / Hostel | Email | Password |
@@ -51,7 +52,7 @@ def render_login():
             | Caretaker | caretaker@demo.teamr | demo1234 |
             | Admin | admin@demo.teamr | demo1234 |
 
-            > ⚠️ These are fictional demo accounts, not real IIT Patna staff or students.
+            > These are demo accounts for testing only, not real IIT Patna staff or students.
             """
         )
 
@@ -61,8 +62,9 @@ def render_register():
         st.session_state["page"] = "home"
         st.rerun()
 
-    page_header("📝 Create Account", "Join Team R as a student")
-    st.info("ℹ️ Student accounts can be created here. Caretaker and admin accounts are created by the administrator.")
+    back_button("Sign In", "login", "reg_back")
+    page_header("Create Account", "Join as a student")
+    st.info("Student accounts can be created here. Caretaker and admin accounts are created by the administrator.")
 
     with st.form("register_form"):
         display_name = st.text_input("Full name / Display name")
@@ -96,13 +98,8 @@ def render_register():
                 hostel=hostel or None,
             )
             if ok:
-                st.success("✅ Account created! You can now sign in.")
+                st.success("Account created! You can now sign in.")
                 st.session_state["page"] = "login"
                 st.rerun()
             else:
                 st.error(msg)
-
-    st.markdown("---")
-    if st.button("← Back to Sign In"):
-        st.session_state["page"] = "login"
-        st.rerun()

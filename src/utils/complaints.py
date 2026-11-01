@@ -64,6 +64,7 @@ def create_complaint(
     priority: str = "Medium",
     is_public: bool = True,
     is_demo: bool = False,
+    is_anonymous: bool = False,
 ) -> tuple[bool, str, Optional[Complaint]]:
     """
     Create a new complaint. Returns (success, message, complaint_or_None).
@@ -93,6 +94,7 @@ def create_complaint(
             priority=priority,
             is_public=is_public,
             is_demo=is_demo,
+            is_anonymous=is_anonymous,
             vote_count=0,
         )
         db.add(complaint)
@@ -130,6 +132,34 @@ def get_complaint_by_number(db: Session, complaint_number: str) -> Optional[Comp
 
 def get_complaint_by_id(db: Session, complaint_id: str) -> Optional[Complaint]:
     return db.query(Complaint).filter(Complaint.id == complaint_id).first()
+
+
+def delete_complaint(db: Session, complaint_id: str, requester_id: str,
+                     requester_role: UserRole) -> tuple[bool, str]:
+    """
+    Delete a complaint. Students may only delete their own complaints that are
+    still in 'Submitted' status. Admins may delete any complaint.
+    """
+    complaint = get_complaint_by_id(db, complaint_id)
+    if not complaint:
+        return False, "Complaint not found."
+
+    if requester_role == UserRole.student:
+        if complaint.submitter_id != requester_id:
+            return False, "You can only delete your own complaints."
+        if complaint.status != ComplaintStatus.submitted:
+            return False, "You can only delete complaints that are still in 'Submitted' status (not yet acknowledged by a caretaker)."
+
+    try:
+        db.delete(complaint)
+        _audit(db, actor_id=requester_id, action="delete_complaint",
+               entity_type="complaint", entity_id=complaint_id,
+               metadata={"complaint_number": complaint.complaint_number})
+        db.commit()
+        return True, f"Complaint {complaint.complaint_number} deleted."
+    except Exception as e:
+        db.rollback()
+        return False, str(e)
 
 
 def list_complaints(

@@ -12,14 +12,15 @@ from src.db.database import get_db
 from src.db.models import Complaint, ComplaintStatus, UserRole
 from src.utils.auth import require_role
 from src.utils.complaints import get_analytics_data
-from src.components.ui import page_header
+from src.components.ui import page_header, back_button
 
 
 def render():
     require_role(UserRole.admin)
     db = get_db()
     try:
-        page_header("📈 Analytics", "Metrics computed from live database records")
+        back_button("Home", "home", "analytics_back")
+        page_header("Analytics", "Metrics computed from live database records")
         data = get_analytics_data(db)
 
         if data["total"] == 0:

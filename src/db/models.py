@@ -107,6 +107,7 @@ class Complaint(Base):
     assigned_caretaker_id = Column(String(36), ForeignKey("profiles.id"), nullable=True)
     is_public = Column(Boolean, default=True, nullable=False)
     is_demo = Column(Boolean, default=False, nullable=False)
+    is_anonymous = Column(Boolean, default=False, nullable=False)
     merged_into_id = Column(String(36), ForeignKey("complaints.id"), nullable=True)
     vote_count = Column(Integer, default=0, nullable=False)  # denormalized cache
     created_at = Column(DateTime, default=_utcnow, nullable=False)

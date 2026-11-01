@@ -10,36 +10,31 @@ from src.db.models import Category, ComplaintStatus, Priority, UserRole
 from src.utils.complaints import list_complaints, get_seen_status
 from src.utils.auth import is_logged_in, get_current_user, get_role
 from src.components.ui import (
-    complaint_card, empty_state, page_header, demo_banner, status_badge,
-    priority_badge, seen_badge, fmt_dt,
+    complaint_card, empty_state, page_header, back_button,
 )
-import os
 
 HOSTELS = ["", "Aryabhatta", "Asima", "Kalam", "CV Raman", "Other"]
-
 PAGE_SIZE = 10
 
 
 def render():
-    if os.getenv("DEMO_MODE", "true").lower() == "true":
-        demo_banner()
-
-    page_header("📋 Complaint Board",
+    back_button("Home", "home", "board_back")
+    page_header("Complaint Board",
                 "Browse and support hostel grievances raised by the community.")
 
     # ─── Filters ──────────────────────────────────────────────────────────────
-    with st.expander("🔍 Search & Filters", expanded=True):
+    with st.expander("Search & Filters", expanded=True):
         c1, c2 = st.columns([3, 1])
         with c1:
             search = st.text_input("Search by title, description, or complaint ID",
-                                   placeholder="e.g. water cooler, TR-2026-0003…")
+                                   placeholder="e.g. water cooler, TR-2026-0003...")
         with c2:
             sort_by = st.selectbox("Sort by", ["newest", "oldest", "most_supported", "priority"],
                                    format_func=lambda x: {
-                                       "newest": "🕐 Newest first",
-                                       "oldest": "🕐 Oldest first",
-                                       "most_supported": "👥 Most supported",
-                                       "priority": "🔴 Priority",
+                                       "newest": "Newest first",
+                                       "oldest": "Oldest first",
+                                       "most_supported": "Most supported",
+                                       "priority": "Priority",
                                    }[x])
 
         f1, f2, f3, f4, f5 = st.columns(5)
@@ -55,7 +50,7 @@ def render():
             sel_priority = st.selectbox("Priority", ["All"] +
                                         [p.value for p in Priority])
         with f5:
-            sel_block = st.text_input("Block", placeholder="e.g. A, B…")
+            sel_block = st.text_input("Block", placeholder="e.g. A, B...")
 
     # ─── Pagination ────────────────────────────────────────────────────────────
     if "board_page" not in st.session_state:
@@ -82,16 +77,16 @@ def render():
         # Stats bar
         st.markdown(
             f"""
-            <div style="display:flex;gap:20px;padding:12px 0;color:#64748B;font-size:0.85rem;">
-              <span>📊 <strong>{total}</strong> complaint{'s' if total != 1 else ''} found</span>
-              <span>📄 Page {st.session_state['board_page']} of {total_pages}</span>
+            <div style="display:flex;gap:20px;padding:10px 0;color:#64748B;font-size:0.85rem;">
+              <span><strong style="color:#818CF8;">{total}</strong> complaint{"s" if total != 1 else ""} found</span>
+              <span>Page {st.session_state["board_page"]} of {total_pages}</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
         if not complaints:
-            empty_state("No complaints match your filters.", "🔍")
+            empty_state("No complaints match your filters.")
         else:
             for c in complaints:
                 is_seen, ack = get_seen_status(db, c.id)
@@ -101,12 +96,12 @@ def render():
         pc1, pc2, pc3 = st.columns([1, 2, 1])
         with pc1:
             if st.session_state["board_page"] > 1:
-                if st.button("← Previous"):
+                if st.button("Previous", use_container_width=True):
                     st.session_state["board_page"] -= 1
                     st.rerun()
         with pc3:
             if st.session_state["board_page"] < total_pages:
-                if st.button("Next →"):
+                if st.button("Next", use_container_width=True):
                     st.session_state["board_page"] += 1
                     st.rerun()
 
@@ -116,11 +111,11 @@ def render():
     # ─── CTA ──────────────────────────────────────────────────────────────────
     st.markdown("---")
     if is_logged_in() and get_role() in (UserRole.student, UserRole.admin):
-        if st.button("➕ Submit a new complaint", type="primary"):
+        if st.button("Submit a new complaint", type="primary", use_container_width=True):
             st.session_state["page"] = "submit"
             st.rerun()
     elif not is_logged_in():
-        st.info("🔑 Sign in to submit complaints, add your support, or comment on issues.")
-        if st.button("Sign In"):
+        st.info("Sign in to submit complaints, add your support, or comment on issues.")
+        if st.button("Sign In", type="primary", use_container_width=True):
             st.session_state["page"] = "login"
             st.rerun()
