@@ -66,16 +66,16 @@ const Icons = {
 // ─── Badges ─────────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const styles = {
-    'Submitted': 'bg-indigo-950/70 text-indigo-400 border-indigo-800',
-    'Acknowledged': 'bg-amber-950/70 text-amber-400 border-amber-800',
-    'Assigned': 'bg-emerald-950/70 text-emerald-400 border-emerald-800',
-    'In Progress': 'bg-blue-950/70 text-blue-400 border-blue-800',
-    'Resolved': 'bg-emerald-950/70 text-emerald-400 border-emerald-800',
-    'Reopened': 'bg-rose-950/70 text-rose-400 border-rose-800',
-    'Closed': 'bg-slate-800 text-slate-400 border-slate-700',
+    'Submitted': 'bg-blue-950/40 text-blue-300 border-blue-800/50',
+    'Acknowledged': 'bg-amber-950/40 text-amber-300 border-amber-800/50',
+    'Assigned': 'bg-teal-950/40 text-teal-300 border-teal-800/50',
+    'In Progress': 'bg-sky-950/40 text-sky-300 border-sky-800/50',
+    'Resolved': 'bg-emerald-950/40 text-emerald-300 border-emerald-800/50',
+    'Reopened': 'bg-rose-950/40 text-rose-300 border-rose-800/50',
+    'Closed': 'bg-zinc-800/70 text-zinc-400 border-zinc-700/60',
   };
   return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status] || styles['Submitted']}`}>
+    <span className={`px-2 py-0.5 rounded text-[11px] font-medium tracking-normal border ${styles[status] || styles['Submitted']}`}>
       {status || 'Submitted'}
     </span>
   );
@@ -83,13 +83,13 @@ function StatusBadge({ status }) {
 
 function PriorityBadge({ priority }) {
   const styles = {
-    'Low': 'bg-emerald-950/70 text-emerald-400 border-emerald-800',
-    'Medium': 'bg-amber-950/70 text-amber-400 border-amber-800',
-    'High': 'bg-orange-950/70 text-orange-400 border-orange-800',
-    'Urgent': 'bg-rose-950/70 text-rose-400 border-rose-800',
+    'Low': 'bg-zinc-800/60 text-zinc-300 border-zinc-700/50',
+    'Medium': 'bg-amber-950/40 text-amber-300 border-amber-800/50',
+    'High': 'bg-orange-950/40 text-orange-300 border-orange-800/50',
+    'Urgent': 'bg-rose-950/50 text-rose-300 border-rose-800/60',
   };
   return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[priority] || styles['Medium']}`}>
+    <span className={`px-2 py-0.5 rounded text-[11px] font-medium tracking-normal border ${styles[priority] || styles['Medium']}`}>
       {priority || 'Medium'}
     </span>
   );
@@ -98,20 +98,20 @@ function PriorityBadge({ priority }) {
 function SeenBadge({ isSeen, isAcknowledged }) {
   if (isAcknowledged) {
     return (
-      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-emerald-950/70 text-emerald-400 border-emerald-800">
+      <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-normal border bg-emerald-950/40 text-emerald-300 border-emerald-800/50">
         Acknowledged
       </span>
     );
   }
   if (isSeen) {
     return (
-      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-blue-950/70 text-blue-400 border-blue-800">
+      <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-normal border bg-sky-950/40 text-sky-300 border-sky-800/50">
         Seen by caretaker
       </span>
     );
   }
   return (
-    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-rose-950/70 text-rose-400 border-rose-800">
+    <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-normal border bg-zinc-800/70 text-zinc-400 border-zinc-700/50">
       Not yet seen
     </span>
   );
@@ -121,7 +121,7 @@ function BackButton({ label = 'Back', to = '#/board' }) {
   return (
     <a
       href={to}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 hover:text-white transition-colors mb-4"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-zinc-400 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 hover:text-zinc-200 transition-colors duration-150 mb-4"
     >
       <Icons.ArrowLeft /> {label}
     </a>
@@ -135,55 +135,55 @@ function Navbar({ user, unreadCount, onLogout }) {
   const closeMobile = () => setMobileMenuOpen(false);
 
   return (
-    <nav className="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50">
+    <nav className="bg-zinc-950/95 border-b border-zinc-800/80 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <a href="#/" className="flex items-center gap-2.5 text-white font-bold text-lg tracking-tight">
-            <span className="p-1.5 bg-indigo-600 rounded-lg text-white">
+          <a href="#/" className="flex items-center gap-2.5 text-zinc-100 font-semibold text-sm tracking-tight">
+            <span className="p-1.5 bg-blue-600 rounded text-white flex items-center justify-center">
               <Icons.Building />
             </span>
-            <span>Hostel Grievances</span>
-            <span className="hidden sm:inline-block text-xs font-normal text-slate-400 border-l border-slate-700 pl-2 ml-1">
+            <span className="text-zinc-100">Hostel Grievances</span>
+            <span className="hidden sm:inline-block text-xs font-normal text-zinc-400 border-l border-zinc-800 pl-2 ml-1">
               IIT Patna
             </span>
           </a>
 
           {/* Desktop Nav Items */}
-          <div className="hidden md:flex items-center gap-1.5">
-            <a href="#/" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+          <div className="hidden md:flex items-center gap-1">
+            <a href="#/" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
               Home
             </a>
-            <a href="#/board" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+            <a href="#/board" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
               Complaint Board
             </a>
 
             {user?.role === 'student' && (
               <>
-                <a href="#/submit" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+                <a href="#/submit" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                   Submit
                 </a>
-                <a href="#/my-complaints" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+                <a href="#/my-complaints" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                   My Complaints
                 </a>
               </>
             )}
 
             {user?.role === 'caretaker' && (
-              <a href="#/caretaker" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+              <a href="#/caretaker" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                 My Dashboard
               </a>
             )}
 
             {user?.role === 'admin' && (
               <>
-                <a href="#/admin" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+                <a href="#/admin" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                   Admin Dashboard
                 </a>
-                <a href="#/submit" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+                <a href="#/submit" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                   Submit
                 </a>
-                <a href="#/analytics" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+                <a href="#/analytics" className="px-2.5 py-1.5 rounded text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-zinc-900 transition-colors duration-150">
                   Analytics
                 </a>
               </>
@@ -196,25 +196,25 @@ function Navbar({ user, unreadCount, onLogout }) {
               <>
                 <a
                   href="#/notifications"
-                  className="relative p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                  className="relative p-1.5 text-zinc-400 hover:text-zinc-100 rounded hover:bg-zinc-900 transition-colors duration-150"
                   title="Notifications"
                 >
                   <Icons.Bell />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-blue-600 text-[10px] font-semibold text-white">
                       {unreadCount}
                     </span>
                   )}
                 </a>
 
-                <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
+                <div className="flex items-center gap-2.5 pl-2.5 border-l border-zinc-800">
                   <div className="text-right">
-                    <div className="text-xs font-semibold text-slate-200">{user.display_name}</div>
-                    <div className="text-[10px] font-medium text-indigo-400 uppercase tracking-wider">{user.role}</div>
+                    <div className="text-xs font-medium text-zinc-200">{user.display_name}</div>
+                    <div className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">{user.role}</div>
                   </div>
                   <button
                     onClick={onLogout}
-                    className="px-2.5 py-1 text-xs font-medium text-slate-400 hover:text-rose-400 bg-slate-800/80 rounded border border-slate-700/60"
+                    className="px-2 py-1 text-xs font-medium text-zinc-400 hover:text-rose-400 bg-zinc-900 hover:bg-zinc-850 rounded border border-zinc-800 transition-colors duration-150"
                   >
                     Sign Out
                   </button>
@@ -224,13 +224,13 @@ function Navbar({ user, unreadCount, onLogout }) {
               <div className="flex items-center gap-2">
                 <a
                   href="#/login"
-                  className="px-3.5 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 shadow-sm transition"
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-500 shadow-xs transition-colors duration-150"
                 >
                   Sign In
                 </a>
                 <a
                   href="#/register"
-                  className="px-3.5 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 rounded-lg hover:bg-slate-700 transition"
+                  className="px-3 py-1.5 text-xs font-medium text-zinc-300 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 hover:text-white transition-colors duration-150"
                 >
                   Register
                 </a>
@@ -241,10 +241,10 @@ function Navbar({ user, unreadCount, onLogout }) {
           {/* Mobile hamburger button */}
           <div className="flex md:hidden items-center gap-2">
             {user && (
-              <a href="#/notifications" className="relative p-2 text-slate-400 hover:text-white">
+              <a href="#/notifications" className="relative p-1.5 text-zinc-400 hover:text-zinc-100">
                 <Icons.Bell />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-blue-600 text-[10px] font-semibold text-white">
                     {unreadCount}
                   </span>
                 )}
@@ -252,7 +252,7 @@ function Navbar({ user, unreadCount, onLogout }) {
             )}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none"
+              className="p-1.5 text-zinc-400 hover:text-zinc-100 rounded focus:outline-none"
             >
               {mobileMenuOpen ? <Icons.Close /> : <Icons.Menu />}
             </button>
@@ -262,55 +262,55 @@ function Navbar({ user, unreadCount, onLogout }) {
 
       {/* Mobile Drawer (closes automatically when any item is clicked) */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-6 space-y-2">
+        <div className="md:hidden bg-zinc-950 border-b border-zinc-800 px-4 pt-2 pb-5 space-y-1.5">
           {user && (
-            <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700/60 mb-3 flex items-center justify-between">
+            <div className="p-3 bg-zinc-900 rounded border border-zinc-800 mb-3 flex items-center justify-between">
               <div>
-                <div className="text-sm font-semibold text-slate-200">{user.display_name}</div>
-                <div className="text-xs text-indigo-400 uppercase font-medium">{user.role} ({user.hostel || 'Campus'})</div>
+                <div className="text-xs font-semibold text-zinc-200">{user.display_name}</div>
+                <div className="text-[11px] text-zinc-400 uppercase font-medium">{user.role} ({user.hostel || 'Campus'})</div>
               </div>
               <button
                 onClick={() => { onLogout(); closeMobile(); }}
-                className="px-3 py-1 text-xs text-rose-400 bg-slate-800 border border-slate-700 rounded"
+                className="px-2.5 py-1 text-xs text-rose-400 bg-zinc-950 border border-zinc-800 rounded hover:bg-zinc-800"
               >
                 Sign Out
               </button>
             </div>
           )}
 
-          <a onClick={closeMobile} href="#/" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+          <a onClick={closeMobile} href="#/" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
             Home
           </a>
-          <a onClick={closeMobile} href="#/board" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+          <a onClick={closeMobile} href="#/board" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
             Complaint Board
           </a>
 
           {user?.role === 'student' && (
             <>
-              <a onClick={closeMobile} href="#/submit" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+              <a onClick={closeMobile} href="#/submit" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
                 Submit Complaint
               </a>
-              <a onClick={closeMobile} href="#/my-complaints" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+              <a onClick={closeMobile} href="#/my-complaints" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
                 My Complaints
               </a>
             </>
           )}
 
           {user?.role === 'caretaker' && (
-            <a onClick={closeMobile} href="#/caretaker" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+            <a onClick={closeMobile} href="#/caretaker" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
               My Dashboard
             </a>
           )}
 
           {user?.role === 'admin' && (
             <>
-              <a onClick={closeMobile} href="#/admin" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+              <a onClick={closeMobile} href="#/admin" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
                 Admin Dashboard
               </a>
-              <a onClick={closeMobile} href="#/submit" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+              <a onClick={closeMobile} href="#/submit" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
                 Submit Complaint
               </a>
-              <a onClick={closeMobile} href="#/analytics" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">
+              <a onClick={closeMobile} href="#/analytics" className="block px-3 py-1.5 rounded text-xs font-medium text-zinc-300 hover:bg-zinc-900">
                 Analytics
               </a>
             </>
@@ -321,14 +321,14 @@ function Navbar({ user, unreadCount, onLogout }) {
               <a
                 onClick={closeMobile}
                 href="#/login"
-                className="w-full text-center py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500"
+                className="w-full text-center py-2 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-500 shadow-xs"
               >
                 Sign In
               </a>
               <a
                 onClick={closeMobile}
                 href="#/register"
-                className="w-full text-center py-2 text-sm font-medium text-slate-300 bg-slate-800 rounded-lg hover:bg-slate-700"
+                className="w-full text-center py-2 text-xs font-medium text-zinc-300 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800"
               >
                 Create Account
               </a>
@@ -346,41 +346,41 @@ function HomePage({ user }) {
     <div className="py-8 px-4 max-w-4xl mx-auto space-y-10">
       {/* Hero */}
       <div className="text-center space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold text-zinc-100 tracking-tight">
           Hostel Grievance Platform
         </h1>
-        <p className="text-indigo-400 font-semibold text-base sm:text-lg">
+        <p className="text-blue-400 font-medium text-sm sm:text-base">
           IIT Patna — Transparent. Accountable. Community-driven.
         </p>
-        <div className="bg-slate-800/80 border-l-4 border-indigo-500 rounded-lg p-4 max-w-xl mx-auto text-left">
-          <p className="text-slate-300 italic text-sm sm:text-base">
+        <div className="bg-zinc-900/80 border-l-2 border-blue-500 border-t border-r border-b border-zinc-800 rounded p-3.5 max-w-xl mx-auto text-left">
+          <p className="text-zinc-300 italic text-xs sm:text-sm">
             "One complaint gets ignored. A hundred can't be."
           </p>
         </div>
-        <p className="text-slate-400 text-sm max-w-xl mx-auto">
+        <p className="text-zinc-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
           Consolidate recurring hostel issues into a single transparent system.
           Students support issues that matter, and caretakers are accountable for every response.
         </p>
 
         {/* Action Buttons */}
-        <div className="pt-2 flex flex-wrap justify-center gap-3">
+        <div className="pt-2 flex flex-wrap justify-center gap-2.5">
           {!user ? (
             <>
               <a
                 href="#/login"
-                className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium text-xs transition-colors duration-150 shadow-xs"
               >
                 Sign In
               </a>
               <a
                 href="#/register"
-                className="px-6 py-2.5 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded font-medium text-xs transition-colors duration-150"
               >
                 Create Account
               </a>
               <a
                 href="#/board"
-                className="px-6 py-2.5 bg-slate-800/60 text-slate-300 border border-slate-700/60 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                className="px-5 py-2 bg-zinc-900/60 hover:bg-zinc-850 text-zinc-300 border border-zinc-800/80 rounded font-medium text-xs transition-colors duration-150"
               >
                 Browse Public Board
               </a>
@@ -389,7 +389,7 @@ function HomePage({ user }) {
             <>
               <a
                 href="#/board"
-                className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium text-xs transition-colors duration-150 shadow-xs"
               >
                 View Complaint Board
               </a>
@@ -397,13 +397,13 @@ function HomePage({ user }) {
                 <>
                   <a
                     href="#/submit"
-                    className="px-6 py-2.5 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                    className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded font-medium text-xs transition-colors duration-150"
                   >
                     Submit a Complaint
                   </a>
                   <a
                     href="#/my-complaints"
-                    className="px-6 py-2.5 bg-slate-800/60 text-slate-300 border border-slate-700/60 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                    className="px-5 py-2 bg-zinc-900/60 hover:bg-zinc-850 text-zinc-300 border border-zinc-800/80 rounded font-medium text-xs transition-colors duration-150"
                   >
                     My Complaints
                   </a>
@@ -412,7 +412,7 @@ function HomePage({ user }) {
               {user.role === 'caretaker' && (
                 <a
                   href="#/caretaker"
-                  className="px-6 py-2.5 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                  className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded font-medium text-xs transition-colors duration-150"
                 >
                   My Dashboard
                 </a>
@@ -420,7 +420,7 @@ function HomePage({ user }) {
               {user.role === 'admin' && (
                 <a
                   href="#/admin"
-                  className="px-6 py-2.5 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg font-medium text-sm hover:bg-slate-700 transition"
+                  className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded font-medium text-xs transition-colors duration-150"
                 >
                   Admin Dashboard
                 </a>
@@ -431,49 +431,49 @@ function HomePage({ user }) {
       </div>
 
       {/* Feature Cards with Direct Nav Buttons */}
-      <div className="space-y-4">
-        <h2 className="text-center text-lg font-semibold text-slate-200">What you can do</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5 flex flex-col justify-between hover:border-slate-600 transition">
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-white">Report Issues</h3>
-              <p className="text-xs text-slate-400">
+      <div className="space-y-3.5">
+        <h2 className="text-center text-sm font-semibold text-zinc-200 uppercase tracking-wider">What you can do</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col justify-between hover:border-zinc-700 transition-colors duration-150">
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">Report Issues</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Submit complaints with photos, location, and optional anonymity. Get a unique tracking ID instantly.
               </p>
             </div>
             <a
               href={user ? '#/submit' : '#/login'}
-              className="mt-4 block text-center py-2 px-3 text-xs font-medium text-indigo-300 bg-indigo-950/60 border border-indigo-800/60 rounded-lg hover:bg-indigo-900/60 transition"
+              className="mt-4 block text-center py-1.5 px-3 text-xs font-medium text-zinc-200 bg-zinc-800 border border-zinc-700/60 rounded hover:bg-zinc-750 hover:text-white transition-colors duration-150"
             >
               Go to Submit
             </a>
           </div>
 
-          <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5 flex flex-col justify-between hover:border-slate-600 transition">
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-white">Community Support</h3>
-              <p className="text-xs text-slate-400">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col justify-between hover:border-zinc-700 transition-colors duration-150">
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">Community Support</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Upvote issues that affect you too. Multiple votes bubble grievances to caretaker priority.
               </p>
             </div>
             <a
               href="#/board"
-              className="mt-4 block text-center py-2 px-3 text-xs font-medium text-indigo-300 bg-indigo-950/60 border border-indigo-800/60 rounded-lg hover:bg-indigo-900/60 transition"
+              className="mt-4 block text-center py-1.5 px-3 text-xs font-medium text-zinc-200 bg-zinc-800 border border-zinc-700/60 rounded hover:bg-zinc-750 hover:text-white transition-colors duration-150"
             >
               Browse Complaints
             </a>
           </div>
 
-          <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5 flex flex-col justify-between hover:border-slate-600 transition">
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-white">Transparent Tracking</h3>
-              <p className="text-xs text-slate-400">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col justify-between hover:border-zinc-700 transition-colors duration-150">
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">Transparent Tracking</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Every grievance logs an immutable timeline — when seen, acknowledged, worked on, and resolved.
               </p>
             </div>
             <a
               href="#/board"
-              className="mt-4 block text-center py-2 px-3 text-xs font-medium text-indigo-300 bg-indigo-950/60 border border-indigo-800/60 rounded-lg hover:bg-indigo-900/60 transition"
+              className="mt-4 block text-center py-1.5 px-3 text-xs font-medium text-zinc-200 bg-zinc-800 border border-zinc-700/60 rounded hover:bg-zinc-750 hover:text-white transition-colors duration-150"
             >
               Track Statuses
             </a>
@@ -482,9 +482,9 @@ function HomePage({ user }) {
       </div>
 
       {/* How it works */}
-      <div className="border-t border-slate-800 pt-8 space-y-4">
-        <h2 className="text-center text-lg font-semibold text-slate-200">How it works</h2>
-        <div className="space-y-2.5 max-w-2xl mx-auto">
+      <div className="border-t border-zinc-800/80 pt-8 space-y-4">
+        <h2 className="text-center text-sm font-semibold text-zinc-200 uppercase tracking-wider">How it works</h2>
+        <div className="space-y-2 max-w-2xl mx-auto">
           {[
             'Student submits a complaint with photos and exact location details.',
             'Other students review and add their support to amplify urgency.',
@@ -492,11 +492,11 @@ function HomePage({ user }) {
             'Progress is tracked: Acknowledged → In Progress → Resolved.',
             'Student confirms resolution or reopens if the issue persists.',
           ].map((step, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 bg-slate-800/50 border border-slate-700/50 rounded-lg">
-              <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+            <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-900/60 border border-zinc-800 rounded-lg">
+              <span className="w-5 h-5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono font-medium flex items-center justify-center flex-shrink-0">
                 {idx + 1}
               </span>
-              <span className="text-xs sm:text-sm text-slate-300">{step}</span>
+              <span className="text-xs text-zinc-300">{step}</span>
             </div>
           ))}
         </div>
@@ -564,15 +564,15 @@ function BoardPage({ user }) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Complaint Board</h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Complaint Board</h1>
+          <p className="text-xs text-zinc-400">
             Browse and support hostel grievances raised by the community.
           </p>
         </div>
         {user?.role === 'student' && (
           <a
             href="#/submit"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded transition-colors duration-150 shadow-xs"
           >
             <Icons.Plus /> Submit Complaint
           </a>
@@ -581,46 +581,46 @@ function BoardPage({ user }) {
 
       {/* Scope banner for student, caretaker, or public view */}
       {user && user.role !== 'admin' && (
-        <div className="py-2.5 px-3.5 bg-indigo-950/40 border border-indigo-800/60 rounded-xl text-xs text-indigo-300 flex items-center justify-between">
+        <div className="py-2.5 px-3.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-300 flex items-center justify-between">
           <span className="flex items-center gap-1.5">
             <span>🏛️</span>
             <span>
               Showing issues for your assigned hostel: <strong>{user.hostel || 'Hostel'}</strong> {user.block ? `(${user.block})` : ''}
             </span>
           </span>
-          <span className="text-[10px] bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-300 border border-indigo-700/50">
+          <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-300 border border-zinc-700 font-mono">
             Restricted to your hostel
           </span>
         </div>
       )}
       {!user && (
-        <div className="py-2.5 px-3.5 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 flex items-center justify-between">
+        <div className="py-2.5 px-3.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-300 flex items-center justify-between">
           <span className="flex items-center gap-1.5">
             <span>🏛️</span>
             <span>
               Public Complaint Board — <strong>Boys Hostels Only</strong> (Kalam, CV Raman, Aryabhatta Blocks A, B, D)
             </span>
           </span>
-          <span className="text-[10px] bg-indigo-950 px-2 py-0.5 rounded text-indigo-300 border border-indigo-800/60 font-semibold">
+          <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-300 border border-zinc-700 font-medium">
             Boys Hostels
           </span>
         </div>
       )}
 
       {/* Filters Box */}
-      <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 space-y-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <input
             type="text"
             placeholder="Search title, desc, or ID (e.g. TR-2026-0001)..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="sm:col-span-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="sm:col-span-2 px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
           <select
             value={sortBy}
             onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
+            className="px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -629,11 +629,11 @@ function BoardPage({ user }) {
           </select>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5">
           <select
             value={category}
             onChange={(e) => { setCategory(e.target.value); setPage(1); }}
-            className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
           >
             <option value="">All Categories</option>
             {['Water Supply', 'Plumbing', 'Electrical', 'Washroom & Hygiene', 'Cleaning & Waste', 'Furniture & Fixtures', 'Internet & Wi-Fi', 'Safety & Security', 'Other'].map(c => (
@@ -645,7 +645,7 @@ function BoardPage({ user }) {
             <select
               value={hostel}
               onChange={(e) => { setHostel(e.target.value); setPage(1); }}
-              className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
             >
               <option value="">All Hostels (Admin View)</option>
               {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman'].map(h => (
@@ -656,7 +656,7 @@ function BoardPage({ user }) {
             <select
               value={hostel}
               onChange={(e) => { setHostel(e.target.value); setPage(1); }}
-              className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
             >
               <option value="">All Boys Hostels</option>
               <option value="Kalam">Kalam (Blocks A, B, C, D)</option>
@@ -664,7 +664,7 @@ function BoardPage({ user }) {
               <option value="Aryabhatta">Aryabhatta (Blocks A, B, D)</option>
             </select>
           ) : (
-            <div className="px-2.5 py-1.5 bg-slate-900/60 border border-indigo-700/50 rounded-lg text-xs text-indigo-300 font-medium truncate flex items-center">
+            <div className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-300 font-medium truncate flex items-center">
               🏛️ {user.hostel} {user.block ? `(${user.block})` : ''}
             </div>
           )}
@@ -672,7 +672,7 @@ function BoardPage({ user }) {
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-            className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
           >
             <option value="">All Statuses</option>
             {['Submitted', 'Acknowledged', 'Assigned', 'In Progress', 'Resolved', 'Reopened', 'Closed'].map(s => (
@@ -683,7 +683,7 @@ function BoardPage({ user }) {
           <select
             value={priority}
             onChange={(e) => { setPriority(e.target.value); setPage(1); }}
-            className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
           >
             <option value="">All Priorities</option>
             {['Low', 'Medium', 'High', 'Urgent'].map(p => (
@@ -694,21 +694,21 @@ function BoardPage({ user }) {
       </div>
 
       {/* Results Header */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+      <div className="flex items-center justify-between text-xs text-zinc-400 px-1">
         <span>{total} complaint{total !== 1 ? 's' : ''} found</span>
         <span>Page {page} of {totalPages}</span>
       </div>
 
       {/* Complaint List */}
       {loading ? (
-        <div className="py-12 text-center text-slate-400 text-sm">Loading complaints...</div>
+        <div className="py-12 text-center text-zinc-400 text-xs">Loading complaints...</div>
       ) : complaints.length === 0 ? (
-        <div className="bg-slate-800/40 border border-slate-800 rounded-xl py-12 text-center space-y-2">
-          <p className="text-slate-400 text-sm">No complaints match your filters.</p>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center space-y-2">
+          <p className="text-zinc-400 text-xs">No complaints match your filters.</p>
           {(category || hostel || status || priority || search) && (
             <button
               onClick={() => { setSearch(''); setCategory(''); setHostel(''); setStatus(''); setPriority(''); }}
-              className="text-xs text-indigo-400 hover:underline"
+              className="text-xs text-blue-400 hover:underline"
             >
               Reset all filters
             </button>
@@ -719,19 +719,19 @@ function BoardPage({ user }) {
           {complaints.map(c => (
             <div
               key={c.id}
-              className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 hover:border-slate-600 transition shadow-sm space-y-3"
+              className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors duration-150 space-y-3"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-mono text-slate-400">{c.complaint_number}</span>
+                    <span className="text-[11px] font-mono text-zinc-400">{c.complaint_number}</span>
                     {c.is_anonymous && (
-                      <span className="px-2 py-0.2 text-[10px] bg-amber-950/60 text-amber-400 border border-amber-800/60 rounded">
+                      <span className="px-1.5 py-0.2 text-[10px] bg-zinc-800 text-zinc-300 border border-zinc-700 rounded">
                         Anonymous
                       </span>
                     )}
                   </div>
-                  <h3 className="text-base font-semibold text-white tracking-tight">{c.title}</h3>
+                  <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                   <div className="flex flex-wrap items-center gap-2 pt-0.5">
                     <StatusBadge status={c.status} />
                     <PriorityBadge priority={c.priority} />
@@ -739,31 +739,31 @@ function BoardPage({ user }) {
                   </div>
                 </div>
 
-                <div className="text-right text-xs text-slate-400 space-y-0.5 flex-shrink-0">
+                <div className="text-right text-xs text-zinc-400 space-y-0.5 flex-shrink-0">
                   <div>{c.hostel} {c.block ? `· ${c.block}` : ''}</div>
-                  <div className="text-slate-500">{c.category}</div>
-                  <div className="text-[11px] text-slate-500">{c.created_at}</div>
+                  <div className="text-zinc-500">{c.category}</div>
+                  <div className="text-[11px] text-zinc-500">{c.created_at}</div>
                 </div>
               </div>
 
-              <div className="border-t border-slate-700/60 pt-3 flex items-center justify-between text-xs">
+              <div className="border-t border-zinc-800 pt-3 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={(e) => handleVote(e, c.id)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors duration-150 ${
                       c.voted
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-slate-700/60 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-750 border border-zinc-700/60 hover:text-white'
                     }`}
                   >
                     <Icons.ThumbsUp /> {c.vote_count} {c.voted ? 'Supported' : 'Support'}
                   </button>
-                  <span className="text-slate-400 text-[11px]">Updated {c.updated_at}</span>
+                  <span className="text-zinc-500 text-[11px]">Updated {c.updated_at}</span>
                 </div>
 
                 <a
                   href={`#/complaint/${c.id}`}
-                  className="px-3 py-1 text-xs font-medium text-indigo-400 hover:text-indigo-300 bg-slate-800 border border-slate-700 rounded-md hover:bg-slate-700 transition"
+                  className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
                 >
                   View Details →
                 </a>
@@ -779,15 +779,15 @@ function BoardPage({ user }) {
           <button
             disabled={page <= 1}
             onClick={() => setPage(p => Math.max(1, p - 1))}
-            className="px-3.5 py-1.5 text-xs font-medium bg-slate-800 border border-slate-700 rounded-lg text-slate-300 disabled:opacity-40 hover:bg-slate-700"
+            className="px-3 py-1.5 text-xs font-medium bg-zinc-900 border border-zinc-800 rounded text-zinc-300 disabled:opacity-40 hover:bg-zinc-800 hover:text-white transition-colors duration-150"
           >
             ← Previous
           </button>
-          <span className="text-xs text-slate-400">Page {page} of {totalPages}</span>
+          <span className="text-xs text-zinc-400">Page {page} of {totalPages}</span>
           <button
             disabled={page >= totalPages}
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-            className="px-3.5 py-1.5 text-xs font-medium bg-slate-800 border border-slate-700 rounded-lg text-slate-300 disabled:opacity-40 hover:bg-slate-700"
+            className="px-3 py-1.5 text-xs font-medium bg-zinc-900 border border-zinc-800 rounded text-zinc-300 disabled:opacity-40 hover:bg-zinc-800 hover:text-white transition-colors duration-150"
           >
             Next →
           </button>
@@ -944,24 +944,24 @@ function ComplaintDetailPage({ id, user }) {
     }
   };
 
-  if (loading) return <div className="py-12 text-center text-slate-400">Loading details...</div>;
-  if (!complaint) return <div className="py-12 text-center text-rose-400">Complaint not found.</div>;
+  if (loading) return <div className="py-12 text-center text-zinc-400 text-xs">Loading details...</div>;
+  if (!complaint) return <div className="py-12 text-center text-rose-400 text-xs">Complaint not found.</div>;
 
   return (
     <div className="py-6 px-4 max-w-5xl mx-auto space-y-6">
       <BackButton label="Back to Board" to="#/board" />
 
       {/* Header */}
-      <div className="space-y-2 border-b border-slate-800 pb-5">
+      <div className="space-y-2 border-b border-zinc-800 pb-5">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-400">{complaint.complaint_number}</span>
+          <span className="text-xs font-mono text-zinc-400 font-medium">{complaint.complaint_number}</span>
           {complaint.is_anonymous && (
-            <span className="px-2 py-0.5 text-xs bg-amber-950/60 text-amber-400 border border-amber-800/60 rounded">
+            <span className="px-1.5 py-0.5 text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 rounded">
               Anonymous Submission
             </span>
           )}
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{complaint.title}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">{complaint.title}</h1>
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <StatusBadge status={complaint.status} />
           <PriorityBadge priority={complaint.priority} />
@@ -974,64 +974,64 @@ function ComplaintDetailPage({ id, user }) {
         {/* Left Column: Description, Photos, Location, Timeline */}
         <div className="md:col-span-2 space-y-6">
           {/* Description */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-300">Description</h3>
-            <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-4 text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">
+          <div className="space-y-1.5">
+            <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Description</h3>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-xs sm:text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">
               {complaint.description}
             </div>
           </div>
 
           {/* Caretaker Seen Status Callout */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-300">Caretaker Status</h3>
+          <div className="space-y-1.5">
+            <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Caretaker Status</h3>
             {complaint.is_seen ? (
-              <div className="bg-blue-950/40 border border-blue-800/60 rounded-xl p-4 space-y-2 text-xs">
-                <div className="font-semibold text-blue-300 flex items-center gap-1.5">
+              <div className="bg-zinc-900 border border-sky-900/40 rounded-lg p-4 space-y-2 text-xs">
+                <div className="font-semibold text-sky-400 flex items-center gap-1.5">
                   <Icons.Eye /> Seen by Caretaker
                 </div>
-                <div className="text-blue-200">
+                <div className="text-zinc-300">
                   {complaint.caretaker_name || 'Caretaker'} first inspected this grievance on{' '}
-                  <span className="font-semibold text-white">{complaint.first_seen_at}</span>.
+                  <span className="font-medium text-zinc-100">{complaint.first_seen_at}</span>.
                 </div>
                 {complaint.acknowledged_at && (
-                  <div className="text-emerald-300">
-                    Acknowledged on: <span className="font-semibold">{complaint.acknowledged_at}</span>
+                  <div className="text-emerald-400">
+                    Acknowledged on: <span className="font-medium text-zinc-100">{complaint.acknowledged_at}</span>
                   </div>
                 )}
                 {complaint.work_notes && (
-                  <div className="text-slate-300 pt-1 border-t border-blue-900/40">
-                    <strong>Work Notes:</strong> {complaint.work_notes}
+                  <div className="text-zinc-300 pt-1.5 border-t border-zinc-800">
+                    <strong className="text-zinc-200">Work Notes:</strong> {complaint.work_notes}
                   </div>
                 )}
                 {complaint.estimated_completion && (
-                  <div className="text-slate-300">
-                    <strong>Estimated Completion:</strong> {complaint.estimated_completion}
+                  <div className="text-zinc-300">
+                    <strong className="text-zinc-200">Estimated Completion:</strong> {complaint.estimated_completion}
                   </div>
                 )}
               </div>
             ) : (
-              <div className="bg-rose-950/40 border border-rose-800/60 rounded-xl p-4 text-xs space-y-1">
-                <div className="font-semibold text-rose-300">Not yet seen by caretaker</div>
-                <div className="text-rose-200">No caretaker has opened this grievance yet.</div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-xs space-y-1">
+                <div className="font-semibold text-zinc-400">Not yet seen by caretaker</div>
+                <div className="text-zinc-500">No caretaker has opened this grievance yet.</div>
               </div>
             )}
           </div>
 
           {/* Photos */}
           {complaint.photos?.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-slate-300">Photo Evidence</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Photo Evidence</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {complaint.photos.map(p => (
                   <a
                     key={p.id}
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="block bg-slate-800 border border-slate-700 rounded-lg overflow-hidden group"
+                    className="block bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden group hover:border-zinc-700 transition-colors duration-150"
                   >
-                    <img src={p.url} alt={p.filename} className="w-full h-32 object-cover group-hover:opacity-90 transition" />
-                    <div className="p-1.5 text-[10px] text-slate-400 truncate">{p.filename}</div>
+                    <img src={p.url} alt={p.filename} className="w-full h-32 object-cover group-hover:opacity-90 transition-opacity" />
+                    <div className="p-1.5 text-[10px] text-zinc-400 truncate">{p.filename}</div>
                   </a>
                 ))}
               </div>
@@ -1040,18 +1040,18 @@ function ComplaintDetailPage({ id, user }) {
 
           {/* Resolution Photos */}
           {complaint.resolution_photos?.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-emerald-400">Resolution Evidence</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Resolution Evidence</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {complaint.resolution_photos.map(p => (
                   <a
                     key={p.id}
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="block bg-slate-800 border border-emerald-900 rounded-lg overflow-hidden group"
+                    className="block bg-zinc-900 border border-emerald-900/60 rounded-lg overflow-hidden group hover:border-emerald-700 transition-colors duration-150"
                   >
-                    <img src={p.url} alt={p.filename} className="w-full h-32 object-cover group-hover:opacity-90 transition" />
+                    <img src={p.url} alt={p.filename} className="w-full h-32 object-cover group-hover:opacity-90 transition-opacity" />
                     <div className="p-1.5 text-[10px] text-emerald-400 truncate">{p.filename}</div>
                   </a>
                 ))}
@@ -1060,34 +1060,34 @@ function ComplaintDetailPage({ id, user }) {
           )}
 
           {/* Location & Metadata Details */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-300">Location & Submitter</h3>
-            <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 text-xs divide-y divide-slate-700/60">
-              <div className="py-1.5 flex justify-between"><span className="text-slate-400">Hostel</span><span className="text-white font-medium">{complaint.hostel}</span></div>
-              {complaint.block && <div className="py-1.5 flex justify-between"><span className="text-slate-400">Block</span><span className="text-white font-medium">{complaint.block}</span></div>}
-              {complaint.floor && <div className="py-1.5 flex justify-between"><span className="text-slate-400">Floor</span><span className="text-white font-medium">{complaint.floor}</span></div>}
-              {complaint.location_detail && <div className="py-1.5 flex justify-between"><span className="text-slate-400">Specific Location</span><span className="text-white font-medium">{complaint.location_detail}</span></div>}
-              <div className="py-1.5 flex justify-between"><span className="text-slate-400">Category</span><span className="text-white font-medium">{complaint.category}</span></div>
-              <div className="py-1.5 flex justify-between"><span className="text-slate-400">Submitted by</span><span className="text-white font-medium">{complaint.submitter_name}</span></div>
-              <div className="py-1.5 flex justify-between"><span className="text-slate-400">Created</span><span className="text-slate-300">{complaint.created_at}</span></div>
-              <div className="py-1.5 flex justify-between"><span className="text-slate-400">Last updated</span><span className="text-slate-300">{complaint.updated_at}</span></div>
+          <div className="space-y-1.5">
+            <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Location & Submitter</h3>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 text-xs divide-y divide-zinc-800">
+              <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Hostel</span><span className="text-zinc-100 font-medium">{complaint.hostel}</span></div>
+              {complaint.block && <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Block</span><span className="text-zinc-100 font-medium">{complaint.block}</span></div>}
+              {complaint.floor && <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Floor</span><span className="text-zinc-100 font-medium">{complaint.floor}</span></div>}
+              {complaint.location_detail && <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Specific Location</span><span className="text-zinc-100 font-medium">{complaint.location_detail}</span></div>}
+              <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Category</span><span className="text-zinc-100 font-medium">{complaint.category}</span></div>
+              <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Submitted by</span><span className="text-zinc-100 font-medium">{complaint.submitter_name}</span></div>
+              <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Created</span><span className="text-zinc-300">{complaint.created_at}</span></div>
+              <div className="py-1.5 flex justify-between"><span className="text-zinc-400">Last updated</span><span className="text-zinc-300">{complaint.updated_at}</span></div>
             </div>
           </div>
 
           {/* Activity Timeline */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-300">Activity Timeline</h3>
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Activity Timeline</h3>
             <div className="space-y-2">
               {complaint.timeline.map((item, idx) => (
-                <div key={idx} className="p-3 bg-slate-800/50 border-l-4 border-indigo-500 rounded-r-lg text-xs space-y-1">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="font-semibold text-white">
+                <div key={idx} className="p-3 bg-zinc-900 border-l-2 border-zinc-700 border-t border-r border-b border-zinc-800 rounded-r text-xs space-y-1">
+                  <div className="flex items-center justify-between text-zinc-400">
+                    <span className="font-medium text-zinc-100">
                       {item.old_status ? `${item.old_status} → ` : ''}{item.new_status}
                     </span>
-                    <span className="text-[11px]">{item.created_at}</span>
+                    <span className="text-[11px] text-zinc-500">{item.created_at}</span>
                   </div>
-                  <div className="text-slate-400">Updated by: <span className="text-slate-300">{item.actor}</span></div>
-                  {item.notes && <div className="text-slate-300 italic pt-0.5">"{item.notes}"</div>}
+                  <div className="text-zinc-400">Updated by: <span className="text-zinc-300">{item.actor}</span></div>
+                  {item.notes && <div className="text-zinc-300 italic pt-0.5">"{item.notes}"</div>}
                 </div>
               ))}
             </div>
@@ -1095,18 +1095,18 @@ function ComplaintDetailPage({ id, user }) {
         </div>
 
         {/* Right Column: Actions (Support, Caretaker Actions, Discussion) */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Support Counter & Button */}
-          <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 text-center space-y-3">
-            <div className="text-3xl font-extrabold text-indigo-400">{complaint.vote_count}</div>
-            <div className="text-xs text-slate-400">Student Supporters</div>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-center space-y-2.5">
+            <div className="text-2xl font-mono font-bold text-zinc-100">{complaint.vote_count}</div>
+            <div className="text-xs text-zinc-400">Student Supporters</div>
             {user?.role === 'student' && (
               <button
                 onClick={handleVote}
-                className={`w-full py-2 px-3 text-xs font-semibold rounded-lg transition ${
+                className={`w-full py-1.5 px-3 text-xs font-medium rounded transition-colors duration-150 ${
                   complaint.voted
-                    ? 'bg-rose-950/70 text-rose-300 border border-rose-800 hover:bg-rose-900/60'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/20'
+                    ? 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-750'
+                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-xs'
                 }`}
               >
                 {complaint.voted ? 'Remove Support' : 'Add Support'}
@@ -1116,34 +1116,34 @@ function ComplaintDetailPage({ id, user }) {
 
           {/* Student Resolution Actions */}
           {user?.role === 'student' && complaint.submitter_id === user.id && complaint.status === 'Resolved' && (
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Resolution Confirmation</h4>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+              <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Resolution Confirmation</h4>
               {!complaint.student_confirmed_resolved ? (
                 <div className="space-y-2">
                   <button
                     onClick={handleConfirmResolved}
-                    className="w-full py-2 px-3 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg"
+                    className="w-full py-1.5 px-3 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors duration-150"
                   >
                     Confirm Resolved
                   </button>
-                  <div className="pt-2 border-t border-slate-700/60 space-y-2">
+                  <div className="pt-2 border-t border-zinc-800 space-y-2">
                     <input
                       type="text"
                       placeholder="Reason to reopen..."
                       value={reopenReason}
                       onChange={(e) => setReopenReason(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                      className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
                     />
                     <button
                       onClick={handleReopen}
-                      className="w-full py-1.5 px-3 text-xs font-medium text-rose-300 bg-rose-950/60 border border-rose-800 rounded hover:bg-rose-900/60"
+                      className="w-full py-1.5 px-3 text-xs font-medium text-rose-300 bg-rose-950/40 border border-rose-800/60 rounded hover:bg-rose-900/50 transition-colors duration-150"
                     >
                       Reopen Grievance
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="p-2.5 bg-emerald-950/40 border border-emerald-800/60 rounded text-xs text-emerald-300 text-center">
+                <div className="p-2.5 bg-emerald-950/30 border border-emerald-800/50 rounded text-xs text-emerald-300 text-center">
                   You confirmed this resolution. Thank you!
                 </div>
               )}
@@ -1152,14 +1152,14 @@ function ComplaintDetailPage({ id, user }) {
 
           {/* Caretaker / Admin Actions Box */}
           {user && (user.role === 'caretaker' || user.role === 'admin') && (
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-4">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Caretaker Controls</h4>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3.5">
+              <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Caretaker Controls</h4>
 
               {/* Mark Seen */}
               {!complaint.is_seen && (
                 <button
                   onClick={handleMarkSeen}
-                  className="w-full py-2 px-3 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center gap-1.5"
+                  className="w-full py-1.5 px-3 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded flex items-center justify-center gap-1.5 transition-colors duration-150"
                 >
                   <Icons.Eye /> Mark as Seen
                 </button>
@@ -1167,24 +1167,24 @@ function ComplaintDetailPage({ id, user }) {
 
               {/* Acknowledge */}
               {!complaint.acknowledged_at && (
-                <div className="space-y-2 pt-2 border-t border-slate-700/60">
-                  <div className="text-xs font-medium text-slate-300">Acknowledge Complaint</div>
+                <div className="space-y-2 pt-2 border-t border-zinc-800">
+                  <div className="text-xs font-medium text-zinc-300">Acknowledge Complaint</div>
                   <textarea
                     placeholder="Work notes (e.g. Electrician scheduled for 3 PM)..."
                     value={ackNotes}
                     onChange={(e) => setAckNotes(e.target.value)}
                     rows="2"
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                    className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
                   />
                   <input
                     type="date"
                     value={ackDate}
                     onChange={(e) => setAckDate(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                    className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
                   />
                   <button
                     onClick={handleAcknowledge}
-                    className="w-full py-2 px-3 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-lg"
+                    className="w-full py-1.5 px-3 text-xs font-medium bg-amber-600 hover:bg-amber-500 text-white rounded transition-colors duration-150"
                   >
                     Confirm Acknowledgement
                   </button>
@@ -1193,12 +1193,12 @@ function ComplaintDetailPage({ id, user }) {
 
               {/* Status Update */}
               {complaint.allowed_transitions?.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-700/60">
-                  <div className="text-xs font-medium text-slate-300">Update Status</div>
+                <div className="space-y-2 pt-2 border-t border-zinc-800">
+                  <div className="text-xs font-medium text-zinc-300">Update Status</div>
                   <select
                     value={statusVal}
                     onChange={(e) => setStatusVal(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                    className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
                   >
                     {complaint.allowed_transitions.map(s => (
                       <option key={s} value={s}>{s}</option>
@@ -1209,11 +1209,11 @@ function ComplaintDetailPage({ id, user }) {
                     placeholder="Status update notes..."
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                    className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
                   />
                   <button
                     onClick={handleStatusUpdate}
-                    className="w-full py-2 px-3 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg"
+                    className="w-full py-1.5 px-3 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors duration-150"
                   >
                     Update Status
                   </button>
@@ -1222,18 +1222,18 @@ function ComplaintDetailPage({ id, user }) {
 
               {/* Upload Resolution Photo */}
               {(complaint.status === 'In Progress' || complaint.status === 'Resolved') && (
-                <form onSubmit={handleUploadResolutionPhoto} className="space-y-2 pt-2 border-t border-slate-700/60">
-                  <div className="text-xs font-medium text-slate-300">Upload Resolution Photo</div>
+                <form onSubmit={handleUploadResolutionPhoto} className="space-y-2 pt-2 border-t border-zinc-800">
+                  <div className="text-xs font-medium text-zinc-300">Upload Resolution Photo</div>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setPhotoFile(e.target.files[0])}
-                    className="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-700 file:text-white"
+                    className="w-full text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200"
                   />
                   <button
                     type="submit"
                     disabled={!photoFile}
-                    className="w-full py-1.5 px-3 text-xs font-medium bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 text-white rounded"
+                    className="w-full py-1.5 px-3 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white rounded transition-colors duration-150"
                   >
                     Upload Proof
                   </button>
@@ -1243,33 +1243,33 @@ function ComplaintDetailPage({ id, user }) {
           )}
 
           {/* Discussion / Comments Section */}
-          <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-4">
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Discussion</h4>
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3.5">
+            <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Discussion</h4>
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
               {complaint.comments?.length === 0 ? (
-                <p className="text-xs text-slate-400 text-center py-4">No comments yet.</p>
+                <p className="text-xs text-zinc-500 text-center py-4">No comments yet.</p>
               ) : (
                 complaint.comments.map(cm => (
                   <div
                     key={cm.id}
-                    className={`p-3 rounded-lg text-xs space-y-1 border ${
+                    className={`p-3 rounded text-xs space-y-1 border ${
                       cm.is_official
-                        ? 'bg-indigo-950/50 border-indigo-800/80'
-                        : 'bg-slate-900/60 border-slate-700/60'
+                        ? 'bg-blue-950/20 border-blue-900/40'
+                        : 'bg-zinc-950/60 border-zinc-800'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white">
+                      <span className="font-medium text-zinc-200">
                         {cm.author_name}
                         {cm.is_official && (
-                          <span className="ml-1.5 px-1.5 py-0.2 text-[9px] bg-indigo-600 text-white rounded">
+                          <span className="ml-1.5 px-1.5 py-0.2 text-[9px] bg-blue-600 text-white rounded font-medium">
                             Official
                           </span>
                         )}
                       </span>
-                      <span className="text-[10px] text-slate-500">{cm.created_at}</span>
+                      <span className="text-[10px] text-zinc-500">{cm.created_at}</span>
                     </div>
-                    <div className="text-slate-300 whitespace-pre-wrap">{cm.content}</div>
+                    <div className="text-zinc-300 whitespace-pre-wrap">{cm.content}</div>
                   </div>
                 ))
               )}
@@ -1277,35 +1277,35 @@ function ComplaintDetailPage({ id, user }) {
 
             {/* Comment Form */}
             {user ? (
-              <form onSubmit={handleComment} className="space-y-2 pt-2 border-t border-slate-700/60">
+              <form onSubmit={handleComment} className="space-y-2 pt-2 border-t border-zinc-800">
                 <textarea
                   placeholder="Add a comment..."
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   rows="2"
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600"
                 />
                 {(user.role === 'caretaker' || user.role === 'admin') && (
-                  <label className="flex items-center gap-2 text-xs text-indigo-300">
+                  <label className="flex items-center gap-2 text-xs text-zinc-300">
                     <input
                       type="checkbox"
                       checked={isOfficial}
                       onChange={(e) => setIsOfficial(e.target.checked)}
-                      className="rounded border-slate-700 bg-slate-900 text-indigo-600"
+                      className="rounded border-zinc-800 bg-zinc-950 text-blue-600 focus:ring-0"
                     />
                     Post as official caretaker update
                   </label>
                 )}
                 <button
                   type="submit"
-                  className="w-full py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-sm"
+                  className="w-full py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors duration-150 shadow-xs"
                 >
                   Post Comment
                 </button>
               </form>
             ) : (
               <div className="text-center pt-2">
-                <a href="#/login" className="text-xs text-indigo-400 hover:underline">
+                <a href="#/login" className="text-xs text-blue-400 hover:underline">
                   Sign in to join the discussion
                 </a>
               </div>
@@ -1374,30 +1374,30 @@ function SubmitPage({ user }) {
   if (createdResult) {
     return (
       <div className="py-12 px-4 max-w-xl mx-auto text-center space-y-6">
-        <div className="w-16 h-16 bg-emerald-950/80 border border-emerald-800 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+        <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-800 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl">
           <Icons.Check />
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-white">Grievance Submitted!</h2>
-          <p className="text-sm text-slate-400">
+        <div className="space-y-1.5">
+          <h2 className="text-xl font-bold text-zinc-100 tracking-tight">Grievance Submitted</h2>
+          <p className="text-xs text-zinc-400">
             Your tracking ID is{' '}
-            <span className="font-mono font-bold text-indigo-400 bg-slate-800 px-2 py-0.5 rounded">
+            <span className="font-mono font-medium text-zinc-100 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded">
               {createdResult.complaint_number}
             </span>
           </p>
         </div>
 
         {/* Clear direct action button */}
-        <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
+        <div className="pt-2 flex flex-col sm:flex-row justify-center gap-2.5">
           <a
             href={`#/complaint/${createdResult.complaint_id}`}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg shadow-lg shadow-indigo-600/20"
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded transition-colors duration-150 shadow-xs"
           >
             View Complaint Details
           </a>
           <a
             href="#/board"
-            className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs rounded-lg"
+            className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 font-medium text-xs rounded transition-colors duration-150"
           >
             Go to Complaint Board
           </a>
@@ -1408,7 +1408,7 @@ function SubmitPage({ user }) {
               setDescription('');
               setFiles([]);
             }}
-            className="px-6 py-2.5 bg-slate-800/60 hover:bg-slate-700 text-slate-400 font-medium text-xs rounded-lg"
+            className="px-5 py-2 bg-zinc-900/60 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 font-medium text-xs rounded border border-zinc-800/80 transition-colors duration-150"
           >
             Submit Another
           </button>
@@ -1422,16 +1422,16 @@ function SubmitPage({ user }) {
       <BackButton label="Home" to="#/" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Submit a Complaint</h1>
-        <p className="text-xs text-slate-400">
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Submit a Complaint</h1>
+        <p className="text-xs text-zinc-400">
           Report a hostel issue. Your complaint ID will be generated automatically.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 rounded-lg p-5 space-y-4">
         {/* Allocated hostel banner for students */}
         {isStudent && (
-          <div className="p-3 bg-indigo-950/40 border border-indigo-800/60 rounded-xl text-xs text-indigo-300 flex items-center gap-2">
+          <div className="p-3 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-300 flex items-center gap-2">
             <span>🏛️</span>
             <span>
               You are submitting this grievance for your allocated hostel: <strong>{user?.hostel || 'Hostel'}</strong> {user?.block ? `(${user.block})` : ''}.
@@ -1441,25 +1441,25 @@ function SubmitPage({ user }) {
 
         {/* Title */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Complaint Title *</label>
+          <label className="text-xs font-medium text-zinc-300">Complaint Title *</label>
           <input
             type="text"
             required
             placeholder="e.g. Water cooler not working on 2nd floor"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         {/* Category & Hostel */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Category *</label>
+            <label className="text-xs font-medium text-zinc-300">Category *</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
             >
               {['Water Supply', 'Plumbing', 'Electrical', 'Washroom & Hygiene', 'Cleaning & Waste', 'Furniture & Fixtures', 'Internet & Wi-Fi', 'Safety & Security', 'Other'].map(c => (
                 <option key={c} value={c}>{c}</option>
@@ -1468,21 +1468,21 @@ function SubmitPage({ user }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">
-              Hostel * {isStudent && <span className="text-indigo-400 font-normal">(Allocated)</span>}
+            <label className="text-xs font-medium text-zinc-300">
+              Hostel * {isStudent && <span className="text-zinc-500 font-normal">(Allocated)</span>}
             </label>
             {isStudent ? (
               <input
                 type="text"
                 readOnly
                 value={user?.hostel || 'Hostel'}
-                className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-lg text-xs text-slate-300 cursor-not-allowed"
+                className="w-full px-3 py-1.5 bg-zinc-950/60 border border-zinc-800/60 rounded text-xs text-zinc-400 cursor-not-allowed"
               />
             ) : (
               <select
                 value={hostel}
                 onChange={(e) => setHostel(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
               >
                 {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman'].map(h => (
                   <option key={h} value={h}>{h}</option>
@@ -1495,15 +1495,15 @@ function SubmitPage({ user }) {
         {/* Block, Floor, Specific Location */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">
-              Block / Building {isStudent && user?.block && <span className="text-indigo-400 font-normal">(Allocated)</span>}
+            <label className="text-xs font-medium text-zinc-300">
+              Block / Building {isStudent && user?.block && <span className="text-zinc-500 font-normal">(Allocated)</span>}
             </label>
             {isStudent && user?.block ? (
               <input
                 type="text"
                 readOnly
                 value={user.block}
-                className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-lg text-xs text-slate-300 cursor-not-allowed"
+                className="w-full px-3 py-1.5 bg-zinc-950/60 border border-zinc-800/60 rounded text-xs text-zinc-400 cursor-not-allowed"
               />
             ) : (
               <input
@@ -1511,69 +1511,69 @@ function SubmitPage({ user }) {
                 placeholder="e.g. Block B"
                 value={block}
                 onChange={(e) => setBlock(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+                className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
               />
             )}
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Floor</label>
+            <label className="text-xs font-medium text-zinc-300">Floor</label>
             <input
               type="text"
               placeholder="e.g. 2nd Floor"
               value={floor}
               onChange={(e) => setFloor(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Exact Location</label>
+            <label className="text-xs font-medium text-zinc-300">Exact Location</label>
             <input
               type="text"
               placeholder="e.g. Near Room 214"
               value={locationDetail}
               onChange={(e) => setLocationDetail(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-600"
             />
           </div>
         </div>
 
         {/* Description */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Detailed Description *</label>
+          <label className="text-xs font-medium text-zinc-300">Detailed Description *</label>
           <textarea
             required
             rows="4"
             placeholder="Describe the issue clearly. When did it start? How severe is it?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         {/* Photos */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Photo Evidence (optional)</label>
+          <label className="text-xs font-medium text-zinc-300">Photo Evidence (optional)</label>
           <input
             type="file"
             multiple
             accept="image/*"
             onChange={(e) => setFiles(Array.from(e.target.files))}
-            className="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-slate-700 file:text-white"
+            className="w-full text-xs text-zinc-400 file:mr-3 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-750"
           />
         </div>
 
         {/* Anonymous Checkbox */}
-        <div className="pt-2">
-          <label className="flex items-center gap-2.5 p-3 bg-slate-900/60 border border-slate-700 rounded-lg cursor-pointer">
+        <div className="pt-1">
+          <label className="flex items-center gap-2.5 p-3 bg-zinc-950 border border-zinc-800 rounded cursor-pointer">
             <input
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0"
+              className="w-4 h-4 rounded border-zinc-800 bg-zinc-950 text-blue-600 focus:ring-0"
             />
             <div>
-              <div className="text-xs font-semibold text-white">Submit Anonymously</div>
-              <div className="text-[11px] text-slate-400">
+              <div className="text-xs font-medium text-zinc-200">Submit Anonymously</div>
+              <div className="text-[11px] text-zinc-500">
                 Your name will be hidden on the public board and timeline.
               </div>
             </div>
@@ -1581,11 +1581,11 @@ function SubmitPage({ user }) {
         </div>
 
         {/* Submit Button */}
-        <div className="pt-3">
+        <div className="pt-2">
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-md transition"
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-xs rounded transition-colors duration-150 shadow-xs"
           >
             {submitting ? 'Submitting...' : 'Submit Complaint'}
           </button>
@@ -1637,26 +1637,26 @@ function MyComplaintsPage({ user }) {
       <BackButton label="Home" to="#/" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">My Complaints</h1>
-        <p className="text-xs text-slate-400">
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">My Complaints</h1>
+        <p className="text-xs text-zinc-400">
           Your submissions and supported grievances, {user?.display_name}.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 gap-4 text-xs font-semibold">
+      <div className="flex border-b border-zinc-800 gap-4 text-xs font-medium">
         <button
           onClick={() => setTab('mine')}
-          className={`pb-2 border-b-2 transition ${
-            tab === 'mine' ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'
+          className={`pb-2 border-b-2 transition-colors duration-150 ${
+            tab === 'mine' ? 'border-blue-500 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
           }`}
         >
           My Submissions ({data.my_submissions.length})
         </button>
         <button
           onClick={() => setTab('supported')}
-          className={`pb-2 border-b-2 transition ${
-            tab === 'supported' ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'
+          className={`pb-2 border-b-2 transition-colors duration-150 ${
+            tab === 'supported' ? 'border-blue-500 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
           }`}
         >
           Supported Issues ({data.supported_complaints.length})
@@ -1664,37 +1664,37 @@ function MyComplaintsPage({ user }) {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center text-slate-400 text-sm">Loading complaints...</div>
+        <div className="py-12 text-center text-zinc-400 text-xs">Loading complaints...</div>
       ) : tab === 'mine' ? (
         data.my_submissions.length === 0 ? (
-          <div className="bg-slate-800/40 border border-slate-800 rounded-xl py-12 text-center space-y-3">
-            <p className="text-slate-400 text-sm">You haven't submitted any complaints yet.</p>
-            <a href="#/submit" className="inline-block px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center space-y-3">
+            <p className="text-zinc-400 text-xs">You haven't submitted any complaints yet.</p>
+            <a href="#/submit" className="inline-block px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded shadow-xs transition-colors duration-150">
               Submit your first complaint
             </a>
           </div>
         ) : (
           <div className="space-y-3">
             {data.my_submissions.map(c => (
-              <div key={c.id} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
+              <div key={c.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
                 <div className="flex flex-col sm:flex-row justify-between gap-2">
                   <div className="space-y-1">
-                    <span className="text-xs font-mono text-slate-400">{c.complaint_number}</span>
-                    <h3 className="text-base font-semibold text-white">{c.title}</h3>
+                    <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                    <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                     <div className="flex flex-wrap gap-2 pt-0.5">
                       <StatusBadge status={c.status} />
                       <PriorityBadge priority={c.priority} />
                       <SeenBadge isSeen={c.is_seen} isAcknowledged={c.is_acknowledged} />
                     </div>
                   </div>
-                  <div className="text-right text-xs text-slate-400">
+                  <div className="text-right text-xs text-zinc-400">
                     <div>{c.hostel} {c.block ? `· ${c.block}` : ''}</div>
-                    <div className="text-[11px] text-slate-500">{c.created_at}</div>
+                    <div className="text-[11px] text-zinc-500">{c.created_at}</div>
                   </div>
                 </div>
 
-                <div className="border-t border-slate-700/60 pt-3 flex items-center justify-between">
-                  <span className="text-xs text-slate-400">{c.vote_count} supporter{c.vote_count !== 1 ? 's' : ''}</span>
+                <div className="border-t border-zinc-800 pt-3 flex items-center justify-between">
+                  <span className="text-xs text-zinc-400">{c.vote_count} supporter{c.vote_count !== 1 ? 's' : ''}</span>
 
                   <div className="flex items-center gap-2">
                     {/* Delete Option for Submitted complaints */}
@@ -1703,13 +1703,13 @@ function MyComplaintsPage({ user }) {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleDelete(c.id)}
-                            className="px-2.5 py-1 text-xs bg-rose-600 hover:bg-rose-500 text-white font-medium rounded"
+                            className="px-2.5 py-1 text-xs bg-rose-600 hover:bg-rose-500 text-white font-medium rounded transition-colors duration-150"
                           >
                             Confirm Delete
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(null)}
-                            className="px-2.5 py-1 text-xs bg-slate-700 text-slate-300 rounded"
+                            className="px-2.5 py-1 text-xs bg-zinc-800 text-zinc-300 hover:bg-zinc-750 rounded transition-colors duration-150"
                           >
                             Cancel
                           </button>
@@ -1717,7 +1717,7 @@ function MyComplaintsPage({ user }) {
                       ) : (
                         <button
                           onClick={() => setDeleteConfirmId(c.id)}
-                          className="px-2.5 py-1 text-xs text-rose-400 hover:text-rose-300 bg-slate-900 border border-rose-900/60 rounded"
+                          className="px-2 py-1 text-xs text-rose-400 hover:text-rose-300 bg-zinc-950 border border-rose-900/40 rounded transition-colors duration-150"
                         >
                           <Icons.Trash /> Delete
                         </button>
@@ -1726,7 +1726,7 @@ function MyComplaintsPage({ user }) {
 
                     <a
                       href={`#/complaint/${c.id}`}
-                      className="px-3 py-1 text-xs font-medium text-indigo-400 hover:text-indigo-300 bg-slate-800 border border-slate-700 rounded"
+                      className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
                     >
                       View Details →
                     </a>
@@ -1738,16 +1738,16 @@ function MyComplaintsPage({ user }) {
         )
       ) : (
         data.supported_complaints.length === 0 ? (
-          <div className="bg-slate-800/40 border border-slate-800 rounded-xl py-12 text-center">
-            <p className="text-slate-400 text-sm">You haven't supported any complaints yet.</p>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center">
+            <p className="text-zinc-400 text-xs">You haven't supported any complaints yet.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {data.supported_complaints.map(c => (
-              <div key={c.id} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex justify-between items-center">
+              <div key={c.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex justify-between items-center">
                 <div className="space-y-1">
-                  <span className="text-xs font-mono text-slate-400">{c.complaint_number}</span>
-                  <h3 className="text-sm font-semibold text-white">{c.title}</h3>
+                  <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                  <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                   <div className="flex gap-2">
                     <StatusBadge status={c.status} />
                     <SeenBadge isSeen={c.is_seen} isAcknowledged={c.is_acknowledged} />
@@ -1755,7 +1755,7 @@ function MyComplaintsPage({ user }) {
                 </div>
                 <a
                   href={`#/complaint/${c.id}`}
-                  className="px-3 py-1.5 text-xs text-indigo-400 bg-slate-800 border border-slate-700 rounded hover:bg-slate-700"
+                  className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
                 >
                   View →
                 </a>
@@ -1800,7 +1800,7 @@ function CaretakerDashboard({ user }) {
     }
   };
 
-  if (loading) return <div className="py-12 text-center text-slate-400">Loading dashboard...</div>;
+  if (loading) return <div className="py-12 text-center text-zinc-400 text-xs">Loading dashboard...</div>;
   if (!data) return null;
 
   const currentList = data[tab] || [];
@@ -1811,34 +1811,34 @@ function CaretakerDashboard({ user }) {
 
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-white">Caretaker Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Caretaker Dashboard</h1>
           {user?.hostel && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-900/60 text-indigo-300 border border-indigo-700/60">
+            <span className="px-2 py-0.5 rounded text-xs font-mono font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
               {user.hostel} {user.block ? `(${user.block})` : ''}
             </span>
           )}
         </div>
-        <p className="text-xs text-slate-400">Welcome, {user?.display_name}. Managing grievances for {user?.hostel || 'assigned hostel'}.</p>
+        <p className="text-xs text-zinc-400">Welcome, {user?.display_name}. Managing grievances for {user?.hostel || 'assigned hostel'}.</p>
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {[
-          { label: 'Assigned', val: data.metrics.total_assigned, color: 'text-indigo-400 border-indigo-500' },
-          { label: 'New / Unseen', val: data.metrics.new_unseen, color: 'text-rose-400 border-rose-500' },
-          { label: 'Acknowledged', val: data.metrics.acknowledged, color: 'text-amber-400 border-amber-500' },
-          { label: 'In Progress', val: data.metrics.in_progress, color: 'text-blue-400 border-blue-500' },
-          { label: 'Overdue (>3d)', val: data.metrics.overdue, color: 'text-purple-400 border-purple-500' },
+          { label: 'Assigned', val: data.metrics.total_assigned, color: 'text-zinc-100 border-zinc-700' },
+          { label: 'New / Unseen', val: data.metrics.new_unseen, color: 'text-rose-400 border-rose-900/60' },
+          { label: 'Acknowledged', val: data.metrics.acknowledged, color: 'text-amber-400 border-amber-900/60' },
+          { label: 'In Progress', val: data.metrics.in_progress, color: 'text-sky-400 border-sky-900/60' },
+          { label: 'Overdue (>3d)', val: data.metrics.overdue, color: 'text-purple-400 border-purple-900/60' },
         ].map((m, idx) => (
-          <div key={idx} className={`bg-slate-800/80 border-t-2 ${m.color} border-slate-700 rounded-xl p-3 text-center`}>
-            <div className={`text-2xl font-bold ${m.color.split(' ')[0]}`}>{m.val}</div>
-            <div className="text-[11px] text-slate-400 mt-0.5">{m.label}</div>
+          <div key={idx} className={`bg-zinc-900 border border-zinc-800 border-t-2 ${m.color} rounded-lg p-3 text-center`}>
+            <div className={`text-2xl font-bold font-mono ${m.color.split(' ')[0]}`}>{m.val}</div>
+            <div className="text-[11px] text-zinc-400 mt-0.5">{m.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 gap-4 text-xs font-semibold">
+      <div className="flex border-b border-zinc-800 gap-4 text-xs font-medium">
         {[
           { id: 'unseen', label: `Unseen (${data.unseen.length})` },
           { id: 'assigned', label: `Assigned (${data.assigned.length})` },
@@ -1848,8 +1848,8 @@ function CaretakerDashboard({ user }) {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`pb-2 border-b-2 transition ${
-              tab === t.id ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'
+            className={`pb-2 border-b-2 transition-colors duration-150 ${
+              tab === t.id ? 'border-blue-500 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {t.label}
@@ -1859,16 +1859,16 @@ function CaretakerDashboard({ user }) {
 
       {/* Items */}
       {currentList.length === 0 ? (
-        <div className="bg-slate-800/40 border border-slate-800 rounded-xl py-12 text-center text-slate-400 text-xs">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center text-zinc-400 text-xs">
           No complaints in this category.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {currentList.map(c => (
-            <div key={c.id} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div key={c.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div className="space-y-1">
-                <span className="text-xs font-mono text-slate-400">{c.complaint_number}</span>
-                <h3 className="text-sm font-semibold text-white">{c.title}</h3>
+                <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={c.status} />
                   <PriorityBadge priority={c.priority} />
@@ -1880,14 +1880,14 @@ function CaretakerDashboard({ user }) {
                 {!c.is_seen && (
                   <button
                     onClick={() => markSeen(c.id)}
-                    className="px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded"
+                    className="px-2.5 py-1 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors duration-150 shadow-xs"
                   >
                     Mark Seen
                   </button>
                 )}
                 <a
                   href={`#/complaint/${c.id}`}
-                  className="px-3 py-1.5 text-xs font-medium text-indigo-400 bg-slate-800 border border-slate-700 rounded hover:bg-slate-700"
+                  className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
                 >
                   Inspect →
                 </a>
@@ -1930,25 +1930,25 @@ function AdminDashboard({ user }) {
     fetchAdminData();
   }, [fetchAdminData]);
 
-  if (loading) return <div className="py-12 text-center text-slate-400">Loading admin panel...</div>;
+  if (loading) return <div className="py-12 text-center text-zinc-400 text-xs">Loading admin panel...</div>;
 
   return (
     <div className="py-6 px-4 max-w-5xl mx-auto space-y-6">
       <BackButton label="Home" to="#/" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-        <p className="text-xs text-slate-400">Manage hostel complaints, assignments, users, and audit records.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Admin Dashboard</h1>
+        <p className="text-xs text-zinc-400">Manage hostel complaints, assignments, users, and audit records.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 gap-4 text-xs font-semibold">
+      <div className="flex border-b border-zinc-800 gap-4 text-xs font-medium">
         {['overview', 'users', 'audit'].map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`pb-2 border-b-2 uppercase tracking-wider transition ${
-              tab === t ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'
+            className={`pb-2 border-b-2 uppercase tracking-wider transition-colors duration-150 ${
+              tab === t ? 'border-blue-500 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {t}
@@ -1958,25 +1958,25 @@ function AdminDashboard({ user }) {
 
       {tab === 'overview' && overview && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {[
               { label: 'Total Complaints', val: overview.total_complaints },
               { label: 'Unassigned', val: overview.unassigned_complaints },
               { label: 'Unseen', val: overview.unseen_complaints },
               { label: 'Registered Users', val: overview.total_users },
             ].map((m, idx) => (
-              <div key={idx} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-indigo-400">{m.val}</div>
-                <div className="text-xs text-slate-400 mt-1">{m.label}</div>
+              <div key={idx} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 text-center">
+                <div className="text-2xl font-bold font-mono text-zinc-100">{m.val}</div>
+                <div className="text-xs text-zinc-400 mt-1">{m.label}</div>
               </div>
             ))}
           </div>
 
-          <div className="flex gap-3">
-            <a href="#/board" className="px-4 py-2 text-xs font-medium bg-slate-800 text-slate-200 border border-slate-700 rounded-lg hover:bg-slate-700">
+          <div className="flex gap-2.5">
+            <a href="#/board" className="px-3.5 py-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded transition-colors duration-150">
               Manage All Complaints on Board →
             </a>
-            <a href="#/analytics" className="px-4 py-2 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">
+            <a href="#/analytics" className="px-3.5 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors duration-150 shadow-xs">
               View Analytics & Charts →
             </a>
           </div>
@@ -1984,25 +1984,25 @@ function AdminDashboard({ user }) {
       )}
 
       {tab === 'users' && (
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl overflow-x-auto">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] border-b border-slate-700/80">
+            <thead className="bg-zinc-950 text-zinc-400 uppercase text-[10px] tracking-wider border-b border-zinc-800">
               <tr>
-                <th className="py-2.5 px-3">Name</th>
-                <th className="py-2.5 px-3">Email</th>
-                <th className="py-2.5 px-3">Role</th>
-                <th className="py-2.5 px-3">Hostel</th>
-                <th className="py-2.5 px-3">Joined</th>
+                <th className="py-2.5 px-3 font-semibold">Name</th>
+                <th className="py-2.5 px-3 font-semibold">Email</th>
+                <th className="py-2.5 px-3 font-semibold">Role</th>
+                <th className="py-2.5 px-3 font-semibold">Hostel</th>
+                <th className="py-2.5 px-3 font-semibold">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/60">
+            <tbody className="divide-y divide-zinc-800">
               {users.map(u => (
-                <tr key={u.id} className="hover:bg-slate-700/30">
-                  <td className="py-2 px-3 font-medium text-white">{u.display_name}</td>
-                  <td className="py-2 px-3 text-slate-400">{u.email}</td>
-                  <td className="py-2 px-3"><span className="uppercase text-[10px] font-semibold text-indigo-400">{u.role}</span></td>
-                  <td className="py-2 px-3 text-slate-400">{u.hostel || '—'}</td>
-                  <td className="py-2 px-3 text-slate-500">{u.created_at}</td>
+                <tr key={u.id} className="hover:bg-zinc-850/50 transition-colors duration-100">
+                  <td className="py-2 px-3 font-medium text-zinc-100">{u.display_name}</td>
+                  <td className="py-2 px-3 text-zinc-400">{u.email}</td>
+                  <td className="py-2 px-3"><span className="uppercase text-[10px] font-mono font-medium text-zinc-300">{u.role}</span></td>
+                  <td className="py-2 px-3 text-zinc-400">{u.hostel || '—'}</td>
+                  <td className="py-2 px-3 text-zinc-500">{u.created_at}</td>
                 </tr>
               ))}
             </tbody>
@@ -2011,23 +2011,23 @@ function AdminDashboard({ user }) {
       )}
 
       {tab === 'audit' && (
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl overflow-x-auto">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] border-b border-slate-700/80">
+            <thead className="bg-zinc-950 text-zinc-400 uppercase text-[10px] tracking-wider border-b border-zinc-800">
               <tr>
-                <th className="py-2.5 px-3">Timestamp</th>
-                <th className="py-2.5 px-3">Action</th>
-                <th className="py-2.5 px-3">Actor</th>
-                <th className="py-2.5 px-3">Entity</th>
+                <th className="py-2.5 px-3 font-semibold">Timestamp</th>
+                <th className="py-2.5 px-3 font-semibold">Action</th>
+                <th className="py-2.5 px-3 font-semibold">Actor</th>
+                <th className="py-2.5 px-3 font-semibold">Entity</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/60">
+            <tbody className="divide-y divide-zinc-800">
               {logs.map(l => (
-                <tr key={l.id} className="hover:bg-slate-700/30">
-                  <td className="py-2 px-3 text-slate-400">{l.created_at}</td>
-                  <td className="py-2 px-3 font-mono text-indigo-300">{l.action}</td>
-                  <td className="py-2 px-3 text-white font-medium">{l.actor}</td>
-                  <td className="py-2 px-3 text-slate-500">{l.entity_type}</td>
+                <tr key={l.id} className="hover:bg-zinc-850/50 transition-colors duration-100">
+                  <td className="py-2 px-3 text-zinc-500">{l.created_at}</td>
+                  <td className="py-2 px-3 font-mono text-zinc-300">{l.action}</td>
+                  <td className="py-2 px-3 text-zinc-200 font-medium">{l.actor}</td>
+                  <td className="py-2 px-3 text-zinc-500">{l.entity_type}</td>
                 </tr>
               ))}
             </tbody>
@@ -2057,7 +2057,7 @@ function AnalyticsPage({ user }) {
     })();
   }, []);
 
-  if (loading) return <div className="py-12 text-center text-slate-400">Loading analytics...</div>;
+  if (loading) return <div className="py-12 text-center text-zinc-400 text-xs">Loading analytics...</div>;
   if (!data) return null;
 
   return (
@@ -2066,60 +2066,60 @@ function AnalyticsPage({ user }) {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">Analytics & Performance</h1>
-          <p className="text-xs text-slate-400">Real-time metrics calculated from live database records.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Analytics & Performance</h1>
+          <p className="text-xs text-zinc-400">Real-time metrics calculated from live database records.</p>
         </div>
         <a
           href="/api/analytics/export"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded shadow-xs transition-colors duration-150"
         >
           <Icons.Download /> Download CSV Export
         </a>
       </div>
 
       {/* SLA Averages */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-blue-400">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 text-center">
+          <div className="text-2xl font-bold font-mono text-zinc-100">
             {data.avg_seen_hours !== null ? `${data.avg_seen_hours.toFixed(1)} hrs` : '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-1">Avg Time to First Seen</div>
+          <div className="text-xs text-zinc-400 mt-1">Avg Time to First Seen</div>
         </div>
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-amber-400">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 text-center">
+          <div className="text-2xl font-bold font-mono text-zinc-100">
             {data.avg_ack_hours !== null ? `${data.avg_ack_hours.toFixed(1)} hrs` : '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-1">Avg Time to Acknowledgement</div>
+          <div className="text-xs text-zinc-400 mt-1">Avg Time to Acknowledgement</div>
         </div>
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 text-center">
+          <div className="text-2xl font-bold font-mono text-zinc-100">
             {data.avg_resolution_hours !== null ? `${data.avg_resolution_hours.toFixed(1)} hrs` : '—'}
           </div>
-          <div className="text-xs text-slate-400 mt-1">Avg Time to Resolution</div>
+          <div className="text-xs text-zinc-400 mt-1">Avg Time to Resolution</div>
         </div>
       </div>
 
       {/* Breakdowns */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
-          <h3 className="text-xs font-semibold text-white uppercase tracking-wider">By Category</h3>
-          <div className="space-y-1.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">By Category</h3>
+          <div className="space-y-1">
             {Object.entries(data.by_category || {}).map(([cat, count]) => (
-              <div key={cat} className="flex justify-between text-xs py-1 border-b border-slate-700/40">
-                <span className="text-slate-300">{cat}</span>
-                <span className="font-semibold text-white">{count}</span>
+              <div key={cat} className="flex justify-between text-xs py-1.5 border-b border-zinc-800">
+                <span className="text-zinc-300">{cat}</span>
+                <span className="font-mono font-medium text-zinc-100">{count}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
-          <h3 className="text-xs font-semibold text-white uppercase tracking-wider">By Hostel</h3>
-          <div className="space-y-1.5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">By Hostel</h3>
+          <div className="space-y-1">
             {Object.entries(data.by_hostel || {}).map(([hst, count]) => (
-              <div key={hst} className="flex justify-between text-xs py-1 border-b border-slate-700/40">
-                <span className="text-slate-300">{hst}</span>
-                <span className="font-semibold text-white">{count}</span>
+              <div key={hst} className="flex justify-between text-xs py-1.5 border-b border-zinc-800">
+                <span className="text-zinc-300">{hst}</span>
+                <span className="font-mono font-medium text-zinc-100">{count}</span>
               </div>
             ))}
           </div>
@@ -2166,11 +2166,11 @@ function NotificationsPage({ user, onRead }) {
       <BackButton label="Home" to="#/" />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Notifications</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Notifications</h1>
         {notifs.some(n => !n.is_read) && (
           <button
             onClick={handleMarkAllRead}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium"
+            className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors duration-150"
           >
             Mark all as read
           </button>
@@ -2178,9 +2178,9 @@ function NotificationsPage({ user, onRead }) {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center text-slate-400">Loading...</div>
+        <div className="py-12 text-center text-zinc-400 text-xs">Loading...</div>
       ) : notifs.length === 0 ? (
-        <div className="bg-slate-800/40 border border-slate-800 rounded-xl py-12 text-center text-slate-400 text-xs">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center text-zinc-400 text-xs">
           No notifications.
         </div>
       ) : (
@@ -2188,21 +2188,21 @@ function NotificationsPage({ user, onRead }) {
           {notifs.map(n => (
             <div
               key={n.id}
-              className={`p-3.5 rounded-xl border text-xs space-y-1 transition ${
+              className={`p-3 rounded-lg border text-xs space-y-1 transition-colors duration-150 ${
                 n.is_read
-                  ? 'bg-slate-800/60 border-slate-700/60 text-slate-300'
-                  : 'bg-indigo-950/40 border-indigo-800/70 text-white'
+                  ? 'bg-zinc-900/60 border-zinc-800 text-zinc-300'
+                  : 'bg-zinc-900 border-zinc-700 text-zinc-100'
               }`}
             >
-              <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <div className="flex items-center justify-between text-[11px] text-zinc-400">
                 <span>{n.created_at}</span>
-                {!n.is_read && <span className="text-indigo-400 font-bold uppercase text-[9px]">New</span>}
+                {!n.is_read && <span className="text-blue-400 font-mono font-medium uppercase text-[9px] tracking-wider">New</span>}
               </div>
               <p>{n.message}</p>
               {n.complaint_id && (
                 <a
                   href={`#/complaint/${n.complaint_id}`}
-                  className="inline-block pt-1 text-xs text-indigo-400 hover:underline font-medium"
+                  className="inline-block pt-1 text-xs text-blue-400 hover:underline font-medium"
                 >
                   View Grievance →
                 </a>
@@ -2271,44 +2271,44 @@ function LoginPage({ onLoginSuccess }) {
       <BackButton label="Home" to="#/" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Sign In</h1>
-        <p className="text-xs text-slate-400">Access the IIT Patna Hostel Grievance Platform</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Sign In</h1>
+        <p className="text-xs text-zinc-400">Access the IIT Patna Hostel Grievance Platform</p>
       </div>
 
-      <form onSubmit={(e) => handleLogin(e)} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 space-y-4">
+      <form onSubmit={(e) => handleLogin(e)} className="bg-zinc-900 border border-zinc-800 rounded-lg p-5 space-y-4">
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Email Address</label>
+          <label className="text-xs font-medium text-zinc-300">Email Address</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Password</label>
+          <label className="text-xs font-medium text-zinc-300">Password</label>
           <input
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg transition"
+          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-xs rounded transition-colors duration-150 shadow-xs"
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
 
-        <div className="text-center text-xs text-slate-400 pt-1">
+        <div className="text-center text-xs text-zinc-400 pt-1">
           Don't have an account?{' '}
-          <a href="#/register" className="text-indigo-400 hover:underline">
+          <a href="#/register" className="text-blue-400 hover:underline">
             Register here
           </a>
         </div>
@@ -2373,44 +2373,44 @@ function RegisterPage({ onLoginSuccess }) {
       <BackButton label="Sign In" to="#/login" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Create Account</h1>
-        <p className="text-xs text-slate-400">Join as an IIT Patna student</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">Create Account</h1>
+        <p className="text-xs text-zinc-400">Join as an IIT Patna student</p>
       </div>
 
-      <form onSubmit={handleRegister} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 space-y-4">
+      <form onSubmit={handleRegister} className="bg-zinc-900 border border-zinc-800 rounded-lg p-5 space-y-4">
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Full Name *</label>
+          <label className="text-xs font-medium text-zinc-300">Full Name *</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Email Address *</label>
+          <label className="text-xs font-medium text-zinc-300">Email Address *</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         {/* Gender Selection */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Gender *</label>
+          <label className="text-xs font-medium text-zinc-300">Gender *</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleGenderChange('Male')}
-              className={`py-2 px-3 rounded-lg text-xs font-medium border text-center transition ${
+              className={`py-1.5 px-3 rounded text-xs font-medium border text-center transition-colors duration-150 ${
                 gender === 'Male'
-                  ? 'bg-indigo-600 border-indigo-500 text-white'
-                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
+                  ? 'bg-zinc-800 border-zinc-600 text-zinc-100 font-medium'
+                  : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
               }`}
             >
               Male (Boys Hostels)
@@ -2418,10 +2418,10 @@ function RegisterPage({ onLoginSuccess }) {
             <button
               type="button"
               onClick={() => handleGenderChange('Female')}
-              className={`py-2 px-3 rounded-lg text-xs font-medium border text-center transition ${
+              className={`py-1.5 px-3 rounded text-xs font-medium border text-center transition-colors duration-150 ${
                 gender === 'Female'
-                  ? 'bg-indigo-600 border-indigo-500 text-white'
-                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
+                  ? 'bg-zinc-800 border-zinc-600 text-zinc-100 font-medium'
+                  : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
               }`}
             >
               Female (Girls Hostels)
@@ -2431,17 +2431,17 @@ function RegisterPage({ onLoginSuccess }) {
 
         {/* Hostel Allocation */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Allocated Hostel *</label>
+          <label className="text-xs font-medium text-zinc-300">Allocated Hostel *</label>
           <select
             value={allocation}
             onChange={(e) => setAllocation(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 focus:outline-none focus:border-zinc-600"
           >
             {choices.map(c => (
               <option key={c.label} value={c.label}>{c.label}</option>
             ))}
           </select>
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-zinc-500">
             {gender === 'Female'
               ? 'Girls Hostels: Aryabhatta Block C, Asima'
               : 'Boys Hostels: Kalam (Blocks A-D), CV Raman, Aryabhatta (Blocks A, B, D)'}
@@ -2449,28 +2449,28 @@ function RegisterPage({ onLoginSuccess }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Password (min 6 chars) *</label>
+          <label className="text-xs font-medium text-zinc-300">Password (min 6 chars) *</label>
           <input
             type="password"
             required
             minLength="6"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            className="w-full px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-colors duration-150"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg transition"
+          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-xs rounded transition-colors duration-150 shadow-xs"
         >
           {loading ? 'Creating...' : 'Create Student Account'}
         </button>
 
-        <div className="text-center text-xs text-slate-400 pt-1">
+        <div className="text-center text-xs text-zinc-400 pt-1">
           Already registered?{' '}
-          <a href="#/login" className="text-indigo-400 hover:underline">
+          <a href="#/login" className="text-blue-400 hover:underline">
             Sign In here
           </a>
         </div>
@@ -2548,21 +2548,21 @@ function App() {
     if (route === '#/login') return <LoginPage onLoginSuccess={setUser} />;
     if (route === '#/register') return <RegisterPage onLoginSuccess={setUser} />;
 
-    return <div className="py-12 text-center text-slate-400">Page not found. <a href="#/" className="text-indigo-400 underline">Go Home</a></div>;
+    return <div className="py-12 text-center text-zinc-400 text-xs">Page not found. <a href="#/" className="text-blue-400 underline">Go Home</a></div>;
   };
 
   return (
     <ToastContext.Provider value={toast}>
-      <div className="min-h-screen flex flex-col bg-slate-900 text-slate-200">
+      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-200 antialiased">
         <Navbar user={user} unreadCount={unreadCount} onLogout={handleLogout} />
 
         <main className="flex-1">
           {renderView()}
         </main>
 
-        <footer className="py-6 border-t border-slate-800 text-center text-xs text-slate-500">
+        <footer className="py-6 border-t border-zinc-900 text-center text-xs text-zinc-500">
           <div>Hostel Grievance & Accountability Platform · IIT Patna</div>
-          <div className="text-[11px] text-slate-600 mt-1">Built with FastAPI & React</div>
+          <div className="text-[11px] text-zinc-600 mt-1">Built with FastAPI & React</div>
         </footer>
 
         {/* Floating Toast Notification Container */}
@@ -2570,12 +2570,12 @@ function App() {
           {toasts.map(t => (
             <div
               key={t.id}
-              className={`p-3 rounded-lg text-xs font-medium shadow-xl pointer-events-auto border transition-all ${
+              className={`p-3 rounded-lg text-xs font-medium shadow-lg pointer-events-auto border transition-all ${
                 t.type === 'error'
-                  ? 'bg-rose-950 text-rose-200 border-rose-800'
+                  ? 'bg-zinc-900 text-rose-300 border-rose-900/60'
                   : t.type === 'success'
-                  ? 'bg-emerald-950 text-emerald-200 border-emerald-800'
-                  : 'bg-slate-800 text-white border-slate-700'
+                  ? 'bg-zinc-900 text-emerald-300 border-emerald-900/60'
+                  : 'bg-zinc-900 text-zinc-200 border-zinc-800'
               }`}
             >
               {t.msg}
