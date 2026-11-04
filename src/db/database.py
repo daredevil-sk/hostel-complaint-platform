@@ -83,61 +83,75 @@ def init_db():
 
 def _migrate_db():
     """Apply incremental schema migrations for new columns and seed primary caretakers."""
-    with engine.connect() as conn:
-        if DATABASE_URL.startswith("sqlite"):
-            try:
-                result = conn.execute(text("PRAGMA table_info(complaints)"))
-                cols = {row[1] for row in result}
-                if "is_anonymous" not in cols:
-                    conn.execute(text(
-                        "ALTER TABLE complaints ADD COLUMN is_anonymous BOOLEAN NOT NULL DEFAULT 0"
-                    ))
-                    conn.commit()
+    import logging
+    from sqlalchemy import inspect
+    logger = logging.getLogger("hostel_app")
 
-                p_result = conn.execute(text("PRAGMA table_info(profiles)"))
-                p_cols = {row[1] for row in p_result}
-                if "gender" not in p_cols:
-                    conn.execute(text("ALTER TABLE profiles ADD COLUMN gender VARCHAR(20)"))
-                    conn.commit()
-                if "block" not in p_cols:
-                    conn.execute(text("ALTER TABLE profiles ADD COLUMN block VARCHAR(50)"))
-                    conn.commit()
-            except Exception:
-                pass
-        else:
+    try:
+        inspector = inspect(engine)
+        table_names = set(inspector.get_table_names())
+
+        # 1. Migrate complaints table
+        if "complaints" in table_names:
             try:
-                conn.execute(text(
-                    "ALTER TABLE complaints ADD COLUMN IF NOT EXISTS "
-                    "is_anonymous BOOLEAN NOT NULL DEFAULT FALSE"
-                ))
-                conn.execute(text(
-                    "ALTER TABLE profiles ADD COLUMN IF NOT EXISTS "
-                    "gender VARCHAR(20)"
-                ))
-                conn.execute(text(
-                    "ALTER TABLE profiles ADD COLUMN IF NOT EXISTS "
-                    "block VARCHAR(50)"
-                ))
-                conn.commit()
-            except Exception:
-                pass
+                c_cols = {col["name"] for col in inspector.get_columns("complaints")}
+                if "is_anonymous" not in c_cols:
+                    with engine.begin() as conn:
+                        if engine.dialect.name == "sqlite":
+                            conn.execute(text("ALTER TABLE complaints ADD COLUMN is_anonymous BOOLEAN NOT NULL DEFAULT 0"))
+                        else:
+                            conn.execute(text("ALTER TABLE complaints ADD COLUMN is_anonymous BOOLEAN NOT NULL DEFAULT FALSE"))
+                    logger.info("Migrated complaints table: added is_anonymous")
+            except Exception as e:
+                logger.warning(f"Error checking/migrating complaints: {e}")
+
+        # 2. Migrate profiles table
+        if "profiles" in table_names:
+            try:
+                p_cols = {col["name"] for col in inspector.get_columns("profiles")}
+                if "gender" not in p_cols:
+                    with engine.begin() as conn:
+                        conn.execute(text("ALTER TABLE profiles ADD COLUMN gender VARCHAR(20)"))
+                    logger.info("Migrated profiles table: added gender")
+            except Exception as e:
+                logger.warning(f"Error adding gender to profiles: {e}")
+
+            try:
+                p_cols = {col["name"] for col in inspector.get_columns("profiles")}
+                if "block" not in p_cols:
+                    with engine.begin() as conn:
+                        conn.execute(text("ALTER TABLE profiles ADD COLUMN block VARCHAR(50)"))
+                    logger.info("Migrated profiles table: added block")
+            except Exception as e:
+                logger.warning(f"Error adding block to profiles: {e}")
+
+    except Exception as e:
+        logger.error(f"Migration error: {e}")
 
     _ensure_primary_accounts()
 
 
 def _ensure_primary_accounts():
     """Ensure primary caretakers and admins exist in the database."""
-    try:
-        from src.db.models import Profile, UserRole, Complaint
-        from src.utils.auth import hash_password
-        from src.utils.hostel_rules import PRIMARY_CARETAKERS, DEFAULT_CARETAKER_PASSWORD, DEFAULT_ADMIN_PASSWORD, get_caretaker_email_for_complaint
-        import uuid
+    import logging
+    import uuid
+    from src.db.models import Profile, UserRole, Complaint
+    from src.utils.auth import hash_password
+    from src.utils.hostel_rules import (
+        PRIMARY_CARETAKERS,
+        DEFAULT_CARETAKER_PASSWORD,
+        DEFAULT_ADMIN_PASSWORD,
+        get_caretaker_email_for_complaint,
+    )
 
-        db = SessionLocal()
-        try:
-            # 1. Primary Caretakers
-            caretaker_profiles = {}
-            for email, data in PRIMARY_CARETAKERS.items():
+    logger = logging.getLogger("hostel_app")
+
+    db = SessionLocal()
+    try:
+        # 1. Primary Caretakers
+        caretaker_profiles = {}
+        for email, data in PRIMARY_CARETAKERS.items():
+            try:
                 p = db.query(Profile).filter(Profile.email == email).first()
                 if not p:
                     p = Profile(
@@ -154,13 +168,21 @@ def _ensure_primary_accounts():
                     db.add(p)
                     db.flush()
                 else:
-                    # Keep hostel/gender consistent
+                    # Update fields and ensure active with valid password
+                    p.display_name = data["display_name"]
                     p.hostel = data["hostel"]
                     p.gender = data["gender"]
                     p.role = UserRole.caretaker
+                    p.is_active = True
+                    # Re-hash password if needed or ensure it's valid
+                    p.password_hash = hash_password(DEFAULT_CARETAKER_PASSWORD)
+                    db.flush()
                 caretaker_profiles[email] = p
+            except Exception as e:
+                logger.error(f"Error ensuring caretaker {email}: {e}")
 
-            # 2. Admin accounts
+        # 2. Admin accounts
+        try:
             admin_iitp = db.query(Profile).filter(Profile.email == "admin@iitp.ac.in").first()
             if not admin_iitp:
                 admin_iitp = Profile(
@@ -172,7 +194,15 @@ def _ensure_primary_accounts():
                     is_active=True,
                 )
                 db.add(admin_iitp)
+            else:
+                admin_iitp.role = UserRole.admin
+                admin_iitp.is_active = True
+                admin_iitp.password_hash = hash_password(DEFAULT_ADMIN_PASSWORD)
+                db.flush()
+        except Exception as e:
+            logger.error(f"Error ensuring admin@iitp.ac.in: {e}")
 
+        try:
             admin_demo = db.query(Profile).filter(Profile.email == "admin@demo.teamr").first()
             if not admin_demo:
                 admin_demo = Profile(
@@ -184,7 +214,10 @@ def _ensure_primary_accounts():
                     is_active=True,
                 )
                 db.add(admin_demo)
+        except Exception as e:
+            logger.error(f"Error ensuring demo admin: {e}")
 
+        try:
             ct_demo = db.query(Profile).filter(Profile.email == "caretaker@demo.teamr").first()
             if not ct_demo:
                 ct_demo = Profile(
@@ -196,16 +229,19 @@ def _ensure_primary_accounts():
                     is_active=True,
                 )
                 db.add(ct_demo)
+        except Exception as e:
+            logger.error(f"Error ensuring demo caretaker: {e}")
 
-            # 3. Student accounts
-            student_defaults = {
-                "student1@demo.teamr": {"name": "Pooja Sharma (Asima)", "gender": "Female", "hostel": "Asima", "block": ""},
-                "student2@demo.teamr": {"name": "Ananya Verma (Aryabhatta C)", "gender": "Female", "hostel": "Aryabhatta", "block": "Block C"},
-                "student3@demo.teamr": {"name": "Rahul Kumar (Kalam)", "gender": "Male", "hostel": "Kalam", "block": "Block B"},
-                "student4@demo.teamr": {"name": "Amit Singh (CV Raman)", "gender": "Male", "hostel": "CV Raman", "block": ""},
-                "student5@demo.teamr": {"name": "Rohan Mehta (Aryabhatta A)", "gender": "Male", "hostel": "Aryabhatta", "block": "Block A"},
-            }
-            for s_email, s_data in student_defaults.items():
+        # 3. Student accounts
+        student_defaults = {
+            "student1@demo.teamr": {"name": "Pooja Sharma (Asima)", "gender": "Female", "hostel": "Asima", "block": ""},
+            "student2@demo.teamr": {"name": "Ananya Verma (Aryabhatta C)", "gender": "Female", "hostel": "Aryabhatta", "block": "Block C"},
+            "student3@demo.teamr": {"name": "Rahul Kumar (Kalam)", "gender": "Male", "hostel": "Kalam", "block": "Block B"},
+            "student4@demo.teamr": {"name": "Amit Singh (CV Raman)", "gender": "Male", "hostel": "CV Raman", "block": ""},
+            "student5@demo.teamr": {"name": "Rohan Mehta (Aryabhatta A)", "gender": "Male", "hostel": "Aryabhatta", "block": "Block A"},
+        }
+        for s_email, s_data in student_defaults.items():
+            try:
                 stu = db.query(Profile).filter(Profile.email == s_email).first()
                 if not stu:
                     stu = Profile(
@@ -227,19 +263,26 @@ def _ensure_primary_accounts():
                         stu.block = s_data["block"]
                     if not stu.hostel:
                         stu.hostel = s_data["hostel"]
+            except Exception as e:
+                logger.error(f"Error ensuring student {s_email}: {e}")
 
-            # 4. Auto-assign complaints to respective primary caretaker if not set
+        # 4. Auto-assign complaints to respective primary caretaker if not set
+        try:
             complaints = db.query(Complaint).all()
             for c in complaints:
                 target_email = get_caretaker_email_for_complaint(c.hostel, c.block)
                 ct = caretaker_profiles.get(target_email)
                 if ct and not c.assigned_caretaker_id:
                     c.assigned_caretaker_id = ct.id
+        except Exception as e:
+            logger.error(f"Error auto-assigning complaints: {e}")
 
-            db.commit()
-        except Exception as ex:
-            db.rollback()
-        finally:
-            db.close()
-    except Exception:
-        pass
+        db.commit()
+        logger.info("Primary accounts and caretaker assignments verified successfully.")
+    except Exception as ex:
+        import traceback
+        traceback.print_exc()
+        logger.error(f"Global error in _ensure_primary_accounts: {ex}")
+        db.rollback()
+    finally:
+        db.close()

@@ -579,7 +579,7 @@ function BoardPage({ user }) {
         )}
       </div>
 
-      {/* Scope banner for student or caretaker */}
+      {/* Scope banner for student, caretaker, or public view */}
       {user && user.role !== 'admin' && (
         <div className="py-2.5 px-3.5 bg-indigo-950/40 border border-indigo-800/60 rounded-xl text-xs text-indigo-300 flex items-center justify-between">
           <span className="flex items-center gap-1.5">
@@ -590,6 +590,19 @@ function BoardPage({ user }) {
           </span>
           <span className="text-[10px] bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-300 border border-indigo-700/50">
             Restricted to your hostel
+          </span>
+        </div>
+      )}
+      {!user && (
+        <div className="py-2.5 px-3.5 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <span>🏛️</span>
+            <span>
+              Public Complaint Board — <strong>Boys Hostels Only</strong> (Kalam, CV Raman, Aryabhatta Blocks A, B, D)
+            </span>
+          </span>
+          <span className="text-[10px] bg-indigo-950 px-2 py-0.5 rounded text-indigo-300 border border-indigo-800/60 font-semibold">
+            Boys Hostels
           </span>
         </div>
       )}
@@ -628,16 +641,27 @@ function BoardPage({ user }) {
             ))}
           </select>
 
-          {user?.role === 'admin' || !user ? (
+          {user?.role === 'admin' ? (
             <select
               value={hostel}
               onChange={(e) => { setHostel(e.target.value); setPage(1); }}
               className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
             >
-              <option value="">All Hostels</option>
+              <option value="">All Hostels (Admin View)</option>
               {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman'].map(h => (
                 <option key={h} value={h}>{h}</option>
               ))}
+            </select>
+          ) : !user ? (
+            <select
+              value={hostel}
+              onChange={(e) => { setHostel(e.target.value); setPage(1); }}
+              className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            >
+              <option value="">All Boys Hostels</option>
+              <option value="Kalam">Kalam (Blocks A, B, C, D)</option>
+              <option value="CV Raman">CV Raman</option>
+              <option value="Aryabhatta">Aryabhatta (Blocks A, B, D)</option>
             </select>
           ) : (
             <div className="px-2.5 py-1.5 bg-slate-900/60 border border-indigo-700/50 rounded-lg text-xs text-indigo-300 font-medium truncate flex items-center">

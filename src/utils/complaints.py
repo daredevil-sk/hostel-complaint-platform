@@ -194,9 +194,8 @@ def list_complaints(
     """
     q = db.query(Complaint)
 
-    if current_user:
-        from src.utils.hostel_rules import apply_hostel_filter_to_query
-        q = apply_hostel_filter_to_query(q, current_user, Complaint)
+    from src.utils.hostel_rules import apply_hostel_filter_to_query
+    q = apply_hostel_filter_to_query(q, current_user, Complaint)
 
     if not include_private:
         q = q.filter(Complaint.is_public == True)

@@ -162,9 +162,20 @@ def get_caretaker_email_for_complaint(hostel: str, block: Optional[str] = "") ->
     return "kalam_caretaker@iitp.ac.in"
 
 
+def is_boys_complaint(hostel: str, block: Optional[str] = "") -> bool:
+    norm_h = normalize_hostel(hostel)
+    norm_b = normalize_block(block)
+    if norm_h in ("Kalam", "CV Raman"):
+        return True
+    if norm_h == "Aryabhatta":
+        return not is_block_c(norm_b)
+    return False
+
+
 def can_user_access_complaint(user, complaint_hostel: str, complaint_block: Optional[str] = "") -> bool:
     if not user:
-        return True  # anonymous public viewing if allowed
+        # Public board: boys hostels only
+        return is_boys_complaint(complaint_hostel, complaint_block)
     role = getattr(user, "role", None)
     role_val = getattr(role, "value", str(role)).lower()
     if role_val == "admin":
@@ -229,7 +240,23 @@ def apply_hostel_filter_to_query(query, user, complaint_cls):
     Apply SQLAlchemy filtering on Complaint model query according to user's scope.
     """
     if not user:
-        return query
+        # Public complaint board shows boys hostels only: Kalam, CV Raman, and Aryabhatta (Blocks A, B, D)
+        return query.filter(
+            or_(
+                complaint_cls.hostel.ilike("Kalam"),
+                complaint_cls.hostel.ilike("CV Raman"),
+                complaint_cls.hostel.ilike("CVR"),
+                complaint_cls.hostel.ilike("%Raman%"),
+                and_(
+                    complaint_cls.hostel.ilike("Aryabhatta"),
+                    or_(
+                        complaint_cls.block == None,
+                        complaint_cls.block == "",
+                        not_(sql_is_block_c(complaint_cls)),
+                    ),
+                ),
+            )
+        )
 
     role = getattr(user, "role", None)
     role_val = getattr(role, "value", str(role)).lower()

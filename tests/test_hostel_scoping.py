@@ -138,3 +138,12 @@ def test_student_scoping_and_list_complaints(db):
     # Admin sees all 4 complaints
     admin_list, admin_total = list_complaints(db, current_user=admin)
     assert admin_total == 4
+
+    # Anonymous / public board: sees boys hostels only (Kalam Issue and Aryabhatta A Issue)
+    public_list, public_total = list_complaints(db, current_user=None)
+    assert public_total == 2
+    public_titles = {c.title for c in public_list}
+    assert "Kalam Issue" in public_titles
+    assert "Aryabhatta A Issue" in public_titles
+    assert "Asima Issue" not in public_titles
+    assert "Aryabhatta C Issue" not in public_titles

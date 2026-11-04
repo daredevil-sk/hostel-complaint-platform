@@ -29,12 +29,18 @@ def test_full_migration_flow():
     assert "ReactDOM.createRoot" in res.text
     print("[PASS] React application bundle served successfully")
 
-    # 2. Demo accounts
+    # 2. Demo accounts endpoint (disabled/empty per requirements)
     res = client.get("/api/auth/demo-accounts")
     assert res.status_code == 200
     accounts = res.json()
-    assert len(accounts) >= 6
-    print(f"[PASS] {len(accounts)} 1-click demo accounts available")
+    assert len(accounts) == 0
+    print("[PASS] 1-click demo accounts removed as requested")
+
+    # Health check endpoint
+    h_res = client.get("/api/health")
+    assert h_res.status_code == 200
+    assert h_res.json()["status"] == "healthy"
+    print("[PASS] Health check passed")
 
     # 3. Login as student
     res = client.post("/api/auth/login", json={"email": "student1@demo.teamr", "password": "demo1234"})

@@ -159,28 +159,35 @@ class CreateUserRequest(BaseModel):
 
 @app.post("/api/auth/login")
 def api_login(req: LoginRequest, db: Session = Depends(get_db)):
-    email = req.email.strip().lower()
-    user = db.query(Profile).filter(Profile.email == email).first()
-    if not user or not verify_password(req.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Invalid email or password.")
-    if not user.is_active:
-        raise HTTPException(status_code=403, detail="Account is deactivated.")
+    try:
+        email = req.email.strip().lower()
+        user = db.query(Profile).filter(Profile.email == email).first()
+        if not user or not verify_password(req.password, user.password_hash):
+            raise HTTPException(status_code=400, detail="Invalid email or password.")
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="Account is deactivated.")
 
-    token = secrets.token_hex(32)
-    SESSIONS[token] = user.id
+        token = secrets.token_hex(32)
+        SESSIONS[token] = user.id
 
-    return {
-        "token": token,
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "display_name": user.display_name,
-            "role": user.role.value,
-            "hostel": user.hostel,
-            "gender": getattr(user, "gender", None),
-            "block": getattr(user, "block", None),
+        return {
+            "token": token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "display_name": user.display_name,
+                "role": user.role.value,
+                "hostel": user.hostel,
+                "gender": getattr(user, "gender", None),
+                "block": getattr(user, "block", None),
+            }
         }
-    }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Login server error: {str(exc)}")
 
 
 @app.post("/api/auth/register")
@@ -265,16 +272,7 @@ def api_logout(authorization: Optional[str] = Header(None)):
 
 @app.get("/api/auth/demo-accounts")
 def api_demo_accounts():
-    return [
-        {"role": "Caretaker (Kalam - Boys)", "hostel": "Kalam", "email": "kalam_caretaker@iitp.ac.in", "password": "caretaker123"},
-        {"role": "Caretaker (Asima - Girls)", "hostel": "Asima", "email": "asima_caretaker@iitp.ac.in", "password": "caretaker123"},
-        {"role": "Caretaker (Aryabhatta - Girls)", "hostel": "Aryabhatta Block C", "email": "aryabhatta_girls_caretaker@iitp.ac.in", "password": "caretaker123"},
-        {"role": "Caretaker (Aryabhatta - Boys)", "hostel": "Aryabhatta Blocks A, B, D", "email": "aryabhatta_caretaker@iitp.ac.in", "password": "caretaker123"},
-        {"role": "Caretaker (CV Raman - Boys)", "hostel": "CV Raman", "email": "cvr_caretaker@iitp.ac.in", "password": "caretaker123"},
-        {"role": "Administrator", "hostel": "Admin", "email": "admin@iitp.ac.in", "password": "admin1234"},
-        {"role": "Student (Girls)", "hostel": "Asima", "email": "student1@demo.teamr", "password": "demo1234"},
-        {"role": "Student (Boys)", "hostel": "Kalam", "email": "student3@demo.teamr", "password": "demo1234"},
-    ]
+    return []
 
 
 # ─── Complaints List & Detail Endpoints ──────────────────────────────────────
@@ -1033,14 +1031,47 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 FRONTEND_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend_static")
 
+@app.get("/api/health")
+def api_health(db: Session = Depends(get_db)):
+    from sqlalchemy import inspect
+    from src.db.database import engine
+    try:
+        inspector = inspect(engine)
+        p_cols = [c["name"] for c in inspector.get_columns("profiles")] if "profiles" in inspector.get_table_names() else []
+        c_cols = [c["name"] for c in inspector.get_columns("complaints")] if "complaints" in inspector.get_table_names() else []
+        profile_count = db.query(Profile).count()
+        caretakers = [
+            {"email": p.email, "hostel": p.hostel, "gender": p.gender, "block": p.block}
+            for p in db.query(Profile).filter(Profile.role == UserRole.caretaker).all()
+        ]
+        return {
+            "status": "healthy",
+            "dialect": engine.dialect.name,
+            "profiles_columns": p_cols,
+            "complaints_columns": c_cols,
+            "profile_count": profile_count,
+            "caretakers": caretakers,
+        }
+    except Exception as exc:
+        return {"status": "error", "detail": str(exc)}
+
+
 @app.get("/{full_path:path}")
 def serve_spa(full_path: str):
     # Check if a specific file exists in frontend
     file_path = FRONTEND_DIR / full_path
     if full_path and file_path.exists() and file_path.is_file():
-        return FileResponse(file_path)
+        res = FileResponse(file_path)
+        res.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        res.headers["Pragma"] = "no-cache"
+        res.headers["Expires"] = "0"
+        return res
     # Default to index.html for client-side routing
     index_file = FRONTEND_DIR / "index.html"
     if index_file.exists():
-        return FileResponse(index_file)
+        res = FileResponse(index_file)
+        res.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        res.headers["Pragma"] = "no-cache"
+        res.headers["Expires"] = "0"
+        return res
     return {"message": "Hostel Grievance Platform API is running. Visit /docs for Swagger API."}
