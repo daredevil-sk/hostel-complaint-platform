@@ -1515,7 +1515,6 @@ function SubmitPage({ user }) {
               />
             )}
           </div>
-          </div>
           <div className="space-y-1">
             <label className="text-xs font-semibold text-slate-300">Floor</label>
             <input
@@ -2478,7 +2477,6 @@ function RegisterPage({ onLoginSuccess }) {
       </form>
     </div>
   );
-}
 }
 
 // ─── Main App Component ─────────────────────────────────────────────────────
