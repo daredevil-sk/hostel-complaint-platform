@@ -34,6 +34,8 @@ class UserInfo:
     display_name: str
     role: UserRole
     hostel: str | None = None
+    gender: str | None = None
+    block: str | None = None
     is_active: bool = True
 
     @classmethod
@@ -44,6 +46,8 @@ class UserInfo:
             display_name=profile.display_name,
             role=profile.role,
             hostel=profile.hostel,
+            gender=getattr(profile, "gender", None),
+            block=getattr(profile, "block", None),
             is_active=profile.is_active,
         )
 
@@ -131,13 +135,26 @@ def logout():
 
 def register(email: str, display_name: str, password: str,
              role: UserRole = UserRole.student,
-             hostel: str | None = None) -> tuple[bool, str]:
+             hostel: str | None = None,
+             gender: str | None = None,
+             block: str | None = None) -> tuple[bool, str]:
     """
     Register a new user. Returns (success, message or user_id).
     Only admins should be able to create caretaker/admin accounts;
     this function is also called from the seed script.
     """
     import uuid
+    from src.utils.hostel_rules import validate_allocation, normalize_hostel, normalize_block
+
+    if role == UserRole.student and (gender or hostel):
+        if not gender:
+            return False, "Gender is required for student registration."
+        if not hostel:
+            return False, "Hostel allocation is required."
+        ok, msg = validate_allocation(gender, hostel, block)
+        if not ok:
+            return False, msg
+
     db = get_db()
     try:
         existing = db.query(Profile).filter(
@@ -150,7 +167,9 @@ def register(email: str, display_name: str, password: str,
             display_name=display_name.strip(),
             password_hash=hash_password(password),
             role=role,
-            hostel=hostel,
+            hostel=normalize_hostel(hostel) if hostel else None,
+            gender=gender,
+            block=normalize_block(block) if block else (block or None),
         )
         db.add(user)
         db.commit()
@@ -187,15 +206,15 @@ def can_vote() -> bool:
 
 
 def can_acknowledge(complaint) -> bool:
-    """Caretaker may acknowledge if assigned to the complaint or if admin."""
+    """Caretaker may acknowledge if within their hostel scope or if admin."""
     user = get_current_user()
     if user is None:
         return False
     if user.role == UserRole.admin:
         return True
     if user.role == UserRole.caretaker:
-        return (complaint.assigned_caretaker_id == user.id or
-                complaint.assigned_caretaker_id is None)
+        from src.utils.hostel_rules import can_user_access_complaint
+        return can_user_access_complaint(user, complaint.hostel, complaint.block)
     return False
 
 

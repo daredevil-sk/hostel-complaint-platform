@@ -29,10 +29,11 @@ def render():
 
     try:
         back_button("Home", "home", "ct_back")
-        page_header("Caretaker Dashboard", f"Welcome, {user.display_name}")
+        scope_desc = f"{user.hostel} ({user.block})" if getattr(user, 'block', None) else (getattr(user, 'hostel', '') or "Campus")
+        page_header(f"Caretaker Dashboard — {getattr(user, 'hostel', 'Hostel')}", f"Welcome, {user.display_name}. Managing complaints for {scope_desc}.")
 
         # Stats
-        assigned, _ = list_complaints(db, assigned_caretaker_id=user.id,
+        assigned, _ = list_complaints(db, current_user=user,
                                        include_private=True, page=1, page_size=500)
         total_assigned = len(assigned)
         new_unseen = sum(1 for c in assigned

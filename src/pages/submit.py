@@ -60,12 +60,25 @@ def render():
                                 [c.value for c in Category])
 
         st.markdown("### Location")
-        st.caption("Hostels: Asima (Girls) | Aryabhatta (Block C: Girls; Blocks A, B, D: Boys) | Kalam (Blocks A-D: Boys) | CV Raman (Boys)")
-        c1, c2 = st.columns(2)
-        with c1:
-            hostel = st.selectbox("Hostel *", HOSTELS)
-        with c2:
-            block = st.text_input("Block / Building", placeholder="e.g. Block A, B, C, D")
+        if role == UserRole.student and getattr(user, "hostel", None):
+            st.info(f"🏛️ Publishing issue for your allocated hostel: **{user.hostel}** {f'({user.block})' if getattr(user, 'block', None) else ''}")
+            hostel = user.hostel
+            block = getattr(user, "block", "") or ""
+            c1, c2 = st.columns(2)
+            with c1:
+                st.text_input("Hostel (Allocated)", value=hostel, disabled=True)
+            with c2:
+                if block:
+                    st.text_input("Block (Allocated)", value=block, disabled=True)
+                else:
+                    block = st.text_input("Block / Wing", placeholder="e.g. Block A, B, C, D")
+        else:
+            st.caption("Hostels: Asima (Girls) | Aryabhatta (Block C: Girls; Blocks A, B, D: Boys) | Kalam (Blocks A-D: Boys) | CV Raman (Boys)")
+            c1, c2 = st.columns(2)
+            with c1:
+                hostel = st.selectbox("Hostel *", ["Aryabhatta", "Asima", "Kalam", "CV Raman"])
+            with c2:
+                block = st.text_input("Block / Building", placeholder="e.g. Block A, B, C, D")
 
         c3, c4 = st.columns(2)
         with c3:

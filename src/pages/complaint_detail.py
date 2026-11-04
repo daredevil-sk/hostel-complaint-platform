@@ -48,11 +48,20 @@ def render():
 
         user = get_current_user()
         role = get_role()
+
+        if user and role != UserRole.admin:
+            from src.utils.hostel_rules import can_user_access_complaint
+            if not can_user_access_complaint(user, complaint.hostel, complaint.block):
+                st.error("⛔ Access restricted. You can only view complaints for your assigned hostel.")
+                back_button("Back to Board", "board", "det_back_unauth")
+                return
+
         is_seen, ack = get_seen_status(db, complaint_id)
 
         # ─── Auto mark-seen for assigned caretaker ────────────────────────────
         if user and role in (UserRole.caretaker, UserRole.admin):
-            if complaint.assigned_caretaker_id == user.id or role == UserRole.admin:
+            from src.utils.hostel_rules import can_user_access_complaint
+            if can_user_access_complaint(user, complaint.hostel, complaint.block):
                 if not is_seen or (ack and ack.caretaker_id == user.id and
                                    ack.first_seen_at is None):
                     mark_seen(db, complaint_id, user.id, role)

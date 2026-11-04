@@ -82,7 +82,7 @@ def init_db():
 
 
 def _migrate_db():
-    """Apply incremental schema migrations for new columns."""
+    """Apply incremental schema migrations for new columns and seed primary caretakers."""
     with engine.connect() as conn:
         if DATABASE_URL.startswith("sqlite"):
             try:
@@ -93,6 +93,15 @@ def _migrate_db():
                         "ALTER TABLE complaints ADD COLUMN is_anonymous BOOLEAN NOT NULL DEFAULT 0"
                     ))
                     conn.commit()
+
+                p_result = conn.execute(text("PRAGMA table_info(profiles)"))
+                p_cols = {row[1] for row in p_result}
+                if "gender" not in p_cols:
+                    conn.execute(text("ALTER TABLE profiles ADD COLUMN gender VARCHAR(20)"))
+                    conn.commit()
+                if "block" not in p_cols:
+                    conn.execute(text("ALTER TABLE profiles ADD COLUMN block VARCHAR(50)"))
+                    conn.commit()
             except Exception:
                 pass
         else:
@@ -101,6 +110,136 @@ def _migrate_db():
                     "ALTER TABLE complaints ADD COLUMN IF NOT EXISTS "
                     "is_anonymous BOOLEAN NOT NULL DEFAULT FALSE"
                 ))
+                conn.execute(text(
+                    "ALTER TABLE profiles ADD COLUMN IF NOT EXISTS "
+                    "gender VARCHAR(20)"
+                ))
+                conn.execute(text(
+                    "ALTER TABLE profiles ADD COLUMN IF NOT EXISTS "
+                    "block VARCHAR(50)"
+                ))
                 conn.commit()
             except Exception:
                 pass
+
+    _ensure_primary_accounts()
+
+
+def _ensure_primary_accounts():
+    """Ensure primary caretakers and admins exist in the database."""
+    try:
+        from src.db.models import Profile, UserRole, Complaint
+        from src.utils.auth import hash_password
+        from src.utils.hostel_rules import PRIMARY_CARETAKERS, DEFAULT_CARETAKER_PASSWORD, DEFAULT_ADMIN_PASSWORD, get_caretaker_email_for_complaint
+        import uuid
+
+        db = SessionLocal()
+        try:
+            # 1. Primary Caretakers
+            caretaker_profiles = {}
+            for email, data in PRIMARY_CARETAKERS.items():
+                p = db.query(Profile).filter(Profile.email == email).first()
+                if not p:
+                    p = Profile(
+                        id=str(uuid.uuid4()),
+                        email=email,
+                        display_name=data["display_name"],
+                        password_hash=hash_password(DEFAULT_CARETAKER_PASSWORD),
+                        role=UserRole.caretaker,
+                        hostel=data["hostel"],
+                        gender=data["gender"],
+                        block=",".join(data["blocks"]) if isinstance(data["blocks"], list) else "",
+                        is_active=True,
+                    )
+                    db.add(p)
+                    db.flush()
+                else:
+                    # Keep hostel/gender consistent
+                    p.hostel = data["hostel"]
+                    p.gender = data["gender"]
+                    p.role = UserRole.caretaker
+                caretaker_profiles[email] = p
+
+            # 2. Admin accounts
+            admin_iitp = db.query(Profile).filter(Profile.email == "admin@iitp.ac.in").first()
+            if not admin_iitp:
+                admin_iitp = Profile(
+                    id=str(uuid.uuid4()),
+                    email="admin@iitp.ac.in",
+                    display_name="IIT Patna Hostel Admin",
+                    password_hash=hash_password(DEFAULT_ADMIN_PASSWORD),
+                    role=UserRole.admin,
+                    is_active=True,
+                )
+                db.add(admin_iitp)
+
+            admin_demo = db.query(Profile).filter(Profile.email == "admin@demo.teamr").first()
+            if not admin_demo:
+                admin_demo = Profile(
+                    id=str(uuid.uuid4()),
+                    email="admin@demo.teamr",
+                    display_name="Demo Admin",
+                    password_hash=hash_password("demo1234"),
+                    role=UserRole.admin,
+                    is_active=True,
+                )
+                db.add(admin_demo)
+
+            ct_demo = db.query(Profile).filter(Profile.email == "caretaker@demo.teamr").first()
+            if not ct_demo:
+                ct_demo = Profile(
+                    id=str(uuid.uuid4()),
+                    email="caretaker@demo.teamr",
+                    display_name="Demo Caretaker (Ramesh)",
+                    password_hash=hash_password("demo1234"),
+                    role=UserRole.caretaker,
+                    is_active=True,
+                )
+                db.add(ct_demo)
+
+            # 3. Student accounts
+            student_defaults = {
+                "student1@demo.teamr": {"name": "Pooja Sharma (Asima)", "gender": "Female", "hostel": "Asima", "block": ""},
+                "student2@demo.teamr": {"name": "Ananya Verma (Aryabhatta C)", "gender": "Female", "hostel": "Aryabhatta", "block": "Block C"},
+                "student3@demo.teamr": {"name": "Rahul Kumar (Kalam)", "gender": "Male", "hostel": "Kalam", "block": "Block B"},
+                "student4@demo.teamr": {"name": "Amit Singh (CV Raman)", "gender": "Male", "hostel": "CV Raman", "block": ""},
+                "student5@demo.teamr": {"name": "Rohan Mehta (Aryabhatta A)", "gender": "Male", "hostel": "Aryabhatta", "block": "Block A"},
+            }
+            for s_email, s_data in student_defaults.items():
+                stu = db.query(Profile).filter(Profile.email == s_email).first()
+                if not stu:
+                    stu = Profile(
+                        id=str(uuid.uuid4()),
+                        email=s_email,
+                        display_name=s_data["name"],
+                        password_hash=hash_password("demo1234"),
+                        role=UserRole.student,
+                        gender=s_data["gender"],
+                        hostel=s_data["hostel"],
+                        block=s_data["block"],
+                        is_active=True,
+                    )
+                    db.add(stu)
+                else:
+                    if not stu.gender:
+                        stu.gender = s_data["gender"]
+                    if not stu.block:
+                        stu.block = s_data["block"]
+                    if not stu.hostel:
+                        stu.hostel = s_data["hostel"]
+
+            # 4. Auto-assign complaints to respective primary caretaker if not set
+            complaints = db.query(Complaint).all()
+            for c in complaints:
+                target_email = get_caretaker_email_for_complaint(c.hostel, c.block)
+                ct = caretaker_profiles.get(target_email)
+                if ct and not c.assigned_caretaker_id:
+                    c.assigned_caretaker_id = ct.id
+
+            db.commit()
+        except Exception as ex:
+            db.rollback()
+        finally:
+            db.close()
+    except Exception:
+        pass

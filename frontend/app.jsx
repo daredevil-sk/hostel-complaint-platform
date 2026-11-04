@@ -579,6 +579,21 @@ function BoardPage({ user }) {
         )}
       </div>
 
+      {/* Scope banner for student or caretaker */}
+      {user && user.role !== 'admin' && (
+        <div className="py-2.5 px-3.5 bg-indigo-950/40 border border-indigo-800/60 rounded-xl text-xs text-indigo-300 flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <span>🏛️</span>
+            <span>
+              Showing issues for your assigned hostel: <strong>{user.hostel || 'Hostel'}</strong> {user.block ? `(${user.block})` : ''}
+            </span>
+          </span>
+          <span className="text-[10px] bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-300 border border-indigo-700/50">
+            Restricted to your hostel
+          </span>
+        </div>
+      )}
+
       {/* Filters Box */}
       <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -613,16 +628,22 @@ function BoardPage({ user }) {
             ))}
           </select>
 
-          <select
-            value={hostel}
-            onChange={(e) => { setHostel(e.target.value); setPage(1); }}
-            className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
-          >
-            <option value="">All Hostels</option>
-            {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman', 'Other'].map(h => (
-              <option key={h} value={h}>{h}</option>
-            ))}
-          </select>
+          {user?.role === 'admin' || !user ? (
+            <select
+              value={hostel}
+              onChange={(e) => { setHostel(e.target.value); setPage(1); }}
+              className="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            >
+              <option value="">All Hostels</option>
+              {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman'].map(h => (
+                <option key={h} value={h}>{h}</option>
+              ))}
+            </select>
+          ) : (
+            <div className="px-2.5 py-1.5 bg-slate-900/60 border border-indigo-700/50 rounded-lg text-xs text-indigo-300 font-medium truncate flex items-center">
+              🏛️ {user.hostel} {user.block ? `(${user.block})` : ''}
+            </div>
+          )}
 
           <select
             value={status}
@@ -1274,10 +1295,11 @@ function ComplaintDetailPage({ id, user }) {
 
 // ─── Submit Page ────────────────────────────────────────────────────────────
 function SubmitPage({ user }) {
+  const isStudent = user?.role === 'student';
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Water Supply');
-  const [hostel, setHostel] = useState('Aryabhatta');
-  const [block, setBlock] = useState('');
+  const [hostel, setHostel] = useState(user?.hostel || 'Aryabhatta');
+  const [block, setBlock] = useState(user?.block || '');
   const [floor, setFloor] = useState('');
   const [locationDetail, setLocationDetail] = useState('');
   const [description, setDescription] = useState('');
@@ -1294,13 +1316,16 @@ function SubmitPage({ user }) {
       return;
     }
 
+    const targetHostel = isStudent ? (user?.hostel || hostel) : hostel;
+    const targetBlock = isStudent ? (user?.block || block) : block;
+
     setSubmitting(true);
     const fd = new FormData();
     fd.append('title', title.trim());
     fd.append('description', description.trim());
     fd.append('category', category);
-    fd.append('hostel', hostel);
-    fd.append('block', block.trim());
+    fd.append('hostel', targetHostel);
+    fd.append('block', targetBlock.trim());
     fd.append('floor', floor.trim());
     fd.append('location_detail', locationDetail.trim());
     fd.append('is_anonymous', isAnonymous ? 'true' : 'false');
@@ -1380,6 +1405,16 @@ function SubmitPage({ user }) {
       </div>
 
       <form onSubmit={handleSubmit} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 space-y-4">
+        {/* Allocated hostel banner for students */}
+        {isStudent && (
+          <div className="p-3 bg-indigo-950/40 border border-indigo-800/60 rounded-xl text-xs text-indigo-300 flex items-center gap-2">
+            <span>🏛️</span>
+            <span>
+              You are submitting this grievance for your allocated hostel: <strong>{user?.hostel || 'Hostel'}</strong> {user?.block ? `(${user.block})` : ''}.
+            </span>
+          </div>
+        )}
+
         {/* Title */}
         <div className="space-y-1">
           <label className="text-xs font-semibold text-slate-300">Complaint Title *</label>
@@ -1409,30 +1444,53 @@ function SubmitPage({ user }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Hostel *</label>
-            <select
-              value={hostel}
-              onChange={(e) => setHostel(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
-            >
-              {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman', 'Other'].map(h => (
-                <option key={h} value={h}>{h}</option>
-              ))}
-            </select>
+            <label className="text-xs font-semibold text-slate-300">
+              Hostel * {isStudent && <span className="text-indigo-400 font-normal">(Allocated)</span>}
+            </label>
+            {isStudent ? (
+              <input
+                type="text"
+                readOnly
+                value={user?.hostel || 'Hostel'}
+                className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-lg text-xs text-slate-300 cursor-not-allowed"
+              />
+            ) : (
+              <select
+                value={hostel}
+                onChange={(e) => setHostel(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              >
+                {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman'].map(h => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
 
         {/* Block, Floor, Specific Location */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Block / Building</label>
-            <input
-              type="text"
-              placeholder="e.g. Block B"
-              value={block}
-              onChange={(e) => setBlock(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
-            />
+            <label className="text-xs font-semibold text-slate-300">
+              Block / Building {isStudent && user?.block && <span className="text-indigo-400 font-normal">(Allocated)</span>}
+            </label>
+            {isStudent && user?.block ? (
+              <input
+                type="text"
+                readOnly
+                value={user.block}
+                className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-lg text-xs text-slate-300 cursor-not-allowed"
+              />
+            ) : (
+              <input
+                type="text"
+                placeholder="e.g. Block B"
+                value={block}
+                onChange={(e) => setBlock(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+              />
+            )}
+          </div>
           </div>
           <div className="space-y-1">
             <label className="text-xs font-semibold text-slate-300">Floor</label>
@@ -1729,8 +1787,15 @@ function CaretakerDashboard({ user }) {
       <BackButton label="Home" to="#/" />
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Caretaker Dashboard</h1>
-        <p className="text-xs text-slate-400">Welcome, {user?.display_name}. Track assigned grievances.</p>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-white">Caretaker Dashboard</h1>
+          {user?.hostel && (
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-900/60 text-indigo-300 border border-indigo-700/60">
+              {user.hostel} {user.block ? `(${user.block})` : ''}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-slate-400">Welcome, {user?.display_name}. Managing grievances for {user?.hostel || 'assigned hostel'}.</p>
       </div>
 
       {/* Metric Cards */}
@@ -2128,21 +2193,27 @@ function NotificationsPage({ user, onRead }) {
 }
 
 // ─── Login & Register Pages ─────────────────────────────────────────────────
+const BOYS_HOSTEL_CHOICES = [
+  { hostel: 'Kalam', block: 'Block A', label: 'Kalam - Block A' },
+  { hostel: 'Kalam', block: 'Block B', label: 'Kalam - Block B' },
+  { hostel: 'Kalam', block: 'Block C', label: 'Kalam - Block C' },
+  { hostel: 'Kalam', block: 'Block D', label: 'Kalam - Block D' },
+  { hostel: 'CV Raman', block: '', label: 'CV Raman (CVR)' },
+  { hostel: 'Aryabhatta', block: 'Block A', label: 'Aryabhatta - Block A' },
+  { hostel: 'Aryabhatta', block: 'Block B', label: 'Aryabhatta - Block B' },
+  { hostel: 'Aryabhatta', block: 'Block D', label: 'Aryabhatta - Block D' },
+];
+
+const GIRLS_HOSTEL_CHOICES = [
+  { hostel: 'Aryabhatta', block: 'Block C', label: 'Aryabhatta - Block C' },
+  { hostel: 'Asima', block: '', label: 'Asima' },
+];
+
 function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [demoAccounts, setDemoAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const accs = await api.request('/auth/demo-accounts');
-        setDemoAccounts(accs);
-      } catch {}
-    })();
-  }, []);
 
   const handleLogin = async (e, customEmail, customPass) => {
     if (e) e.preventDefault();
@@ -2219,29 +2290,6 @@ function LoginPage({ onLoginSuccess }) {
           </a>
         </div>
       </form>
-
-      {/* 1-Click Demo Accounts */}
-      {demoAccounts.length > 0 && (
-        <div className="space-y-2.5">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">
-            Instant 1-Click Demo Logins
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {demoAccounts.map((d, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleLogin(null, d.email, d.password)}
-                className="p-2.5 bg-slate-800/90 border border-slate-700 rounded-lg text-left hover:border-indigo-500 transition"
-              >
-                <div className="text-[11px] font-bold text-white">{d.role}</div>
-                <div className="text-[10px] text-indigo-400">{d.hostel}</div>
-                <div className="text-[9px] text-slate-500 truncate">{d.email}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -2250,9 +2298,18 @@ function RegisterPage({ onLoginSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [hostel, setHostel] = useState('Aryabhatta');
+  const [gender, setGender] = useState('Male');
+  const [allocation, setAllocation] = useState(BOYS_HOSTEL_CHOICES[0].label);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+
+  const choices = gender === 'Female' ? GIRLS_HOSTEL_CHOICES : BOYS_HOSTEL_CHOICES;
+
+  const handleGenderChange = (newGender) => {
+    setGender(newGender);
+    const newChoices = newGender === 'Female' ? GIRLS_HOSTEL_CHOICES : BOYS_HOSTEL_CHOICES;
+    setAllocation(newChoices[0].label);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -2261,11 +2318,20 @@ function RegisterPage({ onLoginSuccess }) {
       return;
     }
 
+    const selectedChoice = choices.find(c => c.label === allocation) || choices[0];
+
     setLoading(true);
     try {
       const res = await api.request('/auth/register', {
         method: 'POST',
-        body: { display_name: name, email, password, hostel },
+        body: {
+          display_name: name.trim(),
+          email: email.trim(),
+          password,
+          gender,
+          hostel: selectedChoice.hostel,
+          block: selectedChoice.block,
+        },
       });
       api.setToken(res.token);
       api.setUser(res.user);
@@ -2290,7 +2356,7 @@ function RegisterPage({ onLoginSuccess }) {
 
       <form onSubmit={handleRegister} className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 space-y-4">
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Full Name</label>
+          <label className="text-xs font-semibold text-slate-300">Full Name *</label>
           <input
             type="text"
             required
@@ -2301,7 +2367,7 @@ function RegisterPage({ onLoginSuccess }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Email Address</label>
+          <label className="text-xs font-semibold text-slate-300">Email Address *</label>
           <input
             type="email"
             required
@@ -2311,21 +2377,56 @@ function RegisterPage({ onLoginSuccess }) {
           />
         </div>
 
+        {/* Gender Selection */}
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Hostel</label>
+          <label className="text-xs font-semibold text-slate-300">Gender *</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleGenderChange('Male')}
+              className={`py-2 px-3 rounded-lg text-xs font-medium border text-center transition ${
+                gender === 'Male'
+                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
+              }`}
+            >
+              Male (Boys Hostels)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleGenderChange('Female')}
+              className={`py-2 px-3 rounded-lg text-xs font-medium border text-center transition ${
+                gender === 'Female'
+                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
+              }`}
+            >
+              Female (Girls Hostels)
+            </button>
+          </div>
+        </div>
+
+        {/* Hostel Allocation */}
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-300">Allocated Hostel *</label>
           <select
-            value={hostel}
-            onChange={(e) => setHostel(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white"
+            value={allocation}
+            onChange={(e) => setAllocation(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
           >
-            {['Aryabhatta', 'Asima', 'Kalam', 'CV Raman', 'Other'].map(h => (
-              <option key={h} value={h}>{h}</option>
+            {choices.map(c => (
+              <option key={c.label} value={c.label}>{c.label}</option>
             ))}
           </select>
+          <p className="text-[10px] text-slate-400">
+            {gender === 'Female'
+              ? 'Girls Hostels: Aryabhatta Block C, Asima'
+              : 'Boys Hostels: Kalam (Blocks A-D), CV Raman, Aryabhatta (Blocks A, B, D)'}
+          </p>
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-300">Password (min 6 chars)</label>
+          <label className="text-xs font-semibold text-slate-300">Password (min 6 chars) *</label>
           <input
             type="password"
             required
@@ -2353,6 +2454,7 @@ function RegisterPage({ onLoginSuccess }) {
       </form>
     </div>
   );
+}
 }
 
 // ─── Main App Component ─────────────────────────────────────────────────────

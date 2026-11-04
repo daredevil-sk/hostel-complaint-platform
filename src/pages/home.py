@@ -36,15 +36,15 @@ def render():
     if not is_logged_in():
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
-            if st.button("Sign In", use_container_width=True, type="primary"):
+            if st.button("Sign In", use_container_width=True, type="primary", key="home_signin_btn"):
                 st.session_state["page"] = "login"
                 st.rerun()
             st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-            if st.button("Create Account", use_container_width=True):
+            if st.button("Create Account", use_container_width=True, key="home_create_acc_btn"):
                 st.session_state["page"] = "register"
                 st.rerun()
             st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-            if st.button("Browse Public Board", use_container_width=True):
+            if st.button("Browse Public Board", use_container_width=True, key="home_browse_board_btn"):
                 st.session_state["page"] = "board"
                 st.rerun()
     else:

@@ -111,7 +111,9 @@ class RegisterRequest(BaseModel):
     display_name: str
     email: str
     password: str
+    gender: Optional[str] = None
     hostel: Optional[str] = None
+    block: Optional[str] = None
 
 class UserResponse(BaseModel):
     id: str
@@ -119,6 +121,8 @@ class UserResponse(BaseModel):
     display_name: str
     role: str
     hostel: Optional[str] = None
+    gender: Optional[str] = None
+    block: Optional[str] = None
 
 class CommentRequest(BaseModel):
     content: str
@@ -173,6 +177,8 @@ def api_login(req: LoginRequest, db: Session = Depends(get_db)):
             "display_name": user.display_name,
             "role": user.role.value,
             "hostel": user.hostel,
+            "gender": getattr(user, "gender", None),
+            "block": getattr(user, "block", None),
         }
     }
 
@@ -187,6 +193,20 @@ def api_register(req: RegisterRequest, db: Session = Depends(get_db)):
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
 
+    from src.utils.hostel_rules import validate_allocation, normalize_hostel, normalize_block
+    gender = (req.gender or "").strip()
+    hostel = (req.hostel or "").strip()
+    block = (req.block or "").strip()
+
+    if not gender:
+        raise HTTPException(status_code=400, detail="Gender is required.")
+    if not hostel:
+        raise HTTPException(status_code=400, detail="Allocated hostel is required.")
+
+    ok, err_msg = validate_allocation(gender, hostel, block)
+    if not ok:
+        raise HTTPException(status_code=400, detail=err_msg)
+
     existing = db.query(Profile).filter(Profile.email == email).first()
     if existing:
         raise HTTPException(status_code=400, detail="An account with this email already exists.")
@@ -197,7 +217,9 @@ def api_register(req: RegisterRequest, db: Session = Depends(get_db)):
         display_name=req.display_name.strip(),
         password_hash=hashed,
         role=UserRole.student,
-        hostel=req.hostel or None,
+        gender=gender,
+        hostel=normalize_hostel(hostel),
+        block=normalize_block(block) if block else "",
     )
     db.add(user)
     db.commit()
@@ -214,6 +236,8 @@ def api_register(req: RegisterRequest, db: Session = Depends(get_db)):
             "display_name": user.display_name,
             "role": user.role.value,
             "hostel": user.hostel,
+            "gender": user.gender,
+            "block": user.block,
         }
     }
 
@@ -226,6 +250,8 @@ def api_me(user: Profile = Depends(get_current_user)):
         "display_name": user.display_name,
         "role": user.role.value,
         "hostel": user.hostel,
+        "gender": getattr(user, "gender", None),
+        "block": getattr(user, "block", None),
     }
 
 
@@ -240,12 +266,14 @@ def api_logout(authorization: Optional[str] = Header(None)):
 @app.get("/api/auth/demo-accounts")
 def api_demo_accounts():
     return [
+        {"role": "Caretaker (Kalam - Boys)", "hostel": "Kalam", "email": "kalam_caretaker@iitp.ac.in", "password": "caretaker123"},
+        {"role": "Caretaker (Asima - Girls)", "hostel": "Asima", "email": "asima_caretaker@iitp.ac.in", "password": "caretaker123"},
+        {"role": "Caretaker (Aryabhatta - Girls)", "hostel": "Aryabhatta Block C", "email": "aryabhatta_girls_caretaker@iitp.ac.in", "password": "caretaker123"},
+        {"role": "Caretaker (Aryabhatta - Boys)", "hostel": "Aryabhatta Blocks A, B, D", "email": "aryabhatta_caretaker@iitp.ac.in", "password": "caretaker123"},
+        {"role": "Caretaker (CV Raman - Boys)", "hostel": "CV Raman", "email": "cvr_caretaker@iitp.ac.in", "password": "caretaker123"},
+        {"role": "Administrator", "hostel": "Admin", "email": "admin@iitp.ac.in", "password": "admin1234"},
         {"role": "Student (Girls)", "hostel": "Asima", "email": "student1@demo.teamr", "password": "demo1234"},
-        {"role": "Student (Girls)", "hostel": "Aryabhatta C", "email": "student2@demo.teamr", "password": "demo1234"},
         {"role": "Student (Boys)", "hostel": "Kalam", "email": "student3@demo.teamr", "password": "demo1234"},
-        {"role": "Student (Boys)", "hostel": "CV Raman", "email": "student4@demo.teamr", "password": "demo1234"},
-        {"role": "Caretaker", "hostel": "Campus", "email": "caretaker@demo.teamr", "password": "demo1234"},
-        {"role": "Administrator", "hostel": "Admin", "email": "admin@demo.teamr", "password": "demo1234"},
     ]
 
 
@@ -277,6 +305,7 @@ def api_list_complaints(
         page=page,
         page_size=page_size,
         include_private=False,
+        current_user=user,
     )
 
     total_pages = max(1, (total + page_size - 1) // page_size)
@@ -326,6 +355,14 @@ def api_get_complaint(
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found.")
 
+    if user:
+        from src.utils.hostel_rules import can_user_access_complaint
+        if not can_user_access_complaint(user, complaint.hostel, complaint.block):
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied. You can only view complaints for your assigned hostel."
+            )
+
     if complaint.merged_into_id:
         return {"merged": True, "surviving_id": complaint.merged_into_id}
 
@@ -333,7 +370,8 @@ def api_get_complaint(
 
     # Auto-mark seen if assigned caretaker/admin opens it
     if user and user.role in (UserRole.caretaker, UserRole.admin):
-        if complaint.assigned_caretaker_id == user.id or user.role == UserRole.admin:
+        from src.utils.hostel_rules import can_user_access_complaint
+        if can_user_access_complaint(user, complaint.hostel, complaint.block):
             if not is_seen or (ack and ack.caretaker_id == user.id and ack.first_seen_at is None):
                 mark_seen(db, complaint.id, user.id, user.role)
                 db.refresh(complaint)
@@ -450,6 +488,14 @@ async def api_create_complaint(
     if user.role not in (UserRole.student, UserRole.admin):
         raise HTTPException(status_code=403, detail="Only students and admins can submit complaints.")
 
+    if user.role == UserRole.student:
+        from src.utils.hostel_rules import can_user_access_complaint
+        if not can_user_access_complaint(user, hostel, block):
+            raise HTTPException(
+                status_code=403,
+                detail=f"You can only submit complaints for your allocated hostel ({user.hostel})."
+            )
+
     ok, result, complaint = create_complaint(
         db,
         title=title,
@@ -550,6 +596,13 @@ def api_mark_seen(
     user: Profile = Depends(require_role(UserRole.caretaker, UserRole.admin)),
     db: Session = Depends(get_db),
 ):
+    complaint = get_complaint_by_id(db, complaint_id)
+    if not complaint:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    from src.utils.hostel_rules import can_user_access_complaint
+    if not can_user_access_complaint(user, complaint.hostel, complaint.block):
+        raise HTTPException(status_code=403, detail="Access denied. You can only address complaints for your assigned hostel.")
+
     ok, msg = mark_seen(db, complaint_id, user.id, user.role)
     if not ok:
         raise HTTPException(status_code=400, detail=msg)
@@ -563,6 +616,13 @@ def api_acknowledge(
     user: Profile = Depends(require_role(UserRole.caretaker, UserRole.admin)),
     db: Session = Depends(get_db),
 ):
+    complaint = get_complaint_by_id(db, complaint_id)
+    if not complaint:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    from src.utils.hostel_rules import can_user_access_complaint
+    if not can_user_access_complaint(user, complaint.hostel, complaint.block):
+        raise HTTPException(status_code=403, detail="Access denied. You can only address complaints for your assigned hostel.")
+
     est_dt = None
     if req.estimated_completion:
         try:
@@ -587,6 +647,13 @@ def api_update_status(
     user: Profile = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    complaint = get_complaint_by_id(db, complaint_id)
+    if not complaint:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    from src.utils.hostel_rules import can_user_access_complaint
+    if not can_user_access_complaint(user, complaint.hostel, complaint.block):
+        raise HTTPException(status_code=403, detail="Access denied. You can only address complaints for your assigned hostel.")
+
     ok, msg = update_status(
         db, complaint_id, req.new_status,
         actor_id=user.id, actor_role=user.role, notes=req.notes or "",
@@ -734,7 +801,7 @@ def api_caretaker_dashboard(
     user: Profile = Depends(require_role(UserRole.caretaker, UserRole.admin)),
     db: Session = Depends(get_db),
 ):
-    assigned, _ = list_complaints(db, assigned_caretaker_id=user.id, include_private=True, page=1, page_size=500)
+    assigned, _ = list_complaints(db, current_user=user, include_private=True, page=1, page_size=500)
     total_assigned = len(assigned)
     new_unseen = sum(1 for c in assigned if not get_seen_status(db, c.id)[0])
     acknowledged = sum(1 for c in assigned if c.status == ComplaintStatus.acknowledged)
@@ -956,7 +1023,8 @@ def api_export_csv(
 # ─── Static Files & Frontend Serving ─────────────────────────────────────────
 
 # Mount upload directory
-UPLOAD_DIR = PROJECT_ROOT / os.getenv("UPLOAD_DIR", "uploads")
+upload_env = os.getenv("UPLOAD_DIR", "uploads").lstrip("/\\")
+UPLOAD_DIR = PROJECT_ROOT / upload_env
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 

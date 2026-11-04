@@ -35,26 +35,9 @@ def render_login():
 
     st.markdown("---")
     st.markdown("Don't have an account?")
-    if st.button("Create a student account", use_container_width=True):
+    if st.button("Create a student account", use_container_width=True, key="btn_create_student_acc"):
         st.session_state["page"] = "register"
         st.rerun()
-
-    # Demo accounts
-    with st.expander("Demo accounts (for testing)"):
-        st.markdown(
-            """
-            | Role / Hostel | Email | Password |
-            |---------------|-------|----------|
-            | Student (Asima - Girls) | student1@demo.teamr | demo1234 |
-            | Student (Aryabhatta C - Girls) | student2@demo.teamr | demo1234 |
-            | Student (Kalam - Boys) | student3@demo.teamr | demo1234 |
-            | Student (CV Raman - Boys) | student4@demo.teamr | demo1234 |
-            | Caretaker | caretaker@demo.teamr | demo1234 |
-            | Admin | admin@demo.teamr | demo1234 |
-
-            > These are demo accounts for testing only, not real IIT Patna staff or students.
-            """
-        )
 
 
 def render_register():
@@ -67,12 +50,34 @@ def render_register():
     st.info("Student accounts can be created here. Caretaker and admin accounts are created by the administrator.")
 
     with st.form("register_form"):
-        display_name = st.text_input("Full name / Display name")
-        email = st.text_input("Email address")
-        password = st.text_input("Password", type="password")
-        password2 = st.text_input("Confirm password", type="password")
-        hostel = st.selectbox("Your hostel (optional)", [
-            "", "Aryabhatta", "Asima", "Kalam", "CV Raman", "Other"])
+        display_name = st.text_input("Full name / Display name *")
+        email = st.text_input("Email address *")
+        password = st.text_input("Password *", type="password")
+        password2 = st.text_input("Confirm password *", type="password")
+
+        gender = st.selectbox("Gender *", ["Male", "Female"], key="reg_gender_select")
+
+        if gender == "Male":
+            hostel_choices = [
+                {"hostel": "Kalam", "block": "Block A", "label": "Kalam - Block A"},
+                {"hostel": "Kalam", "block": "Block B", "label": "Kalam - Block B"},
+                {"hostel": "Kalam", "block": "Block C", "label": "Kalam - Block C"},
+                {"hostel": "Kalam", "block": "Block D", "label": "Kalam - Block D"},
+                {"hostel": "CV Raman", "block": "", "label": "CV Raman (CVR)"},
+                {"hostel": "Aryabhatta", "block": "Block A", "label": "Aryabhatta - Block A"},
+                {"hostel": "Aryabhatta", "block": "Block B", "label": "Aryabhatta - Block B"},
+                {"hostel": "Aryabhatta", "block": "Block D", "label": "Aryabhatta - Block D"},
+            ]
+        else:
+            hostel_choices = [
+                {"hostel": "Aryabhatta", "block": "Block C", "label": "Aryabhatta - Block C"},
+                {"hostel": "Asima", "block": "", "label": "Asima"},
+            ]
+
+        labels = [c["label"] for c in hostel_choices]
+        selected_label = st.selectbox("Which hostel are you allocated in? *", labels, key="reg_hostel_select")
+        st.caption("Hostel allocation rules: Kalam A, B, C, D, CVR, Aryabhatta A, B, D for boys; Aryabhatta C, Asima for girls.")
+
         submitted = st.form_submit_button("Create Account", use_container_width=True,
                                           type="primary")
 
@@ -90,12 +95,15 @@ def render_register():
             for e in errors:
                 st.error(e)
         else:
+            chosen = next((c for c in hostel_choices if c["label"] == selected_label), hostel_choices[0])
             ok, msg = register(
                 email=email,
                 display_name=display_name,
                 password=password,
                 role=UserRole.student,
-                hostel=hostel or None,
+                hostel=chosen["hostel"],
+                gender=gender,
+                block=chosen["block"],
             )
             if ok:
                 st.success("Account created! You can now sign in.")

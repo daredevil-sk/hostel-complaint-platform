@@ -74,6 +74,8 @@ class Profile(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(Enum(UserRole), nullable=False, default=UserRole.student)
     hostel = Column(String(100))          # optional default hostel for students
+    gender = Column(String(20), nullable=True)  # Male / Female
+    block = Column(String(50), nullable=True)   # Block A, B, C, D
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=_utcnow, nullable=False)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)

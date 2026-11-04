@@ -79,17 +79,26 @@ def create_complaint(
 
     try:
         complaint_number = generate_complaint_number(db)
+        from src.utils.hostel_rules import get_caretaker_email_for_complaint, normalize_hostel, normalize_block
+        norm_h = normalize_hostel(hostel)
+        norm_b = normalize_block(block) if block else None
+
+        target_caretaker_email = get_caretaker_email_for_complaint(norm_h, norm_b)
+        ct_profile = db.query(Profile).filter(Profile.email == target_caretaker_email).first()
+        assigned_ct_id = ct_profile.id if ct_profile else None
+
         complaint = Complaint(
             id=str(uuid.uuid4()),
             complaint_number=complaint_number,
             title=title.strip(),
             description=description.strip(),
             category=category,
-            hostel=hostel.strip(),
-            block=block.strip() if block else None,
+            hostel=norm_h,
+            block=norm_b,
             floor=floor.strip() if floor else None,
             location_detail=location_detail.strip() if location_detail else None,
             submitter_id=submitter_id,
+            assigned_caretaker_id=assigned_ct_id,
             status=ComplaintStatus.submitted,
             priority=priority,
             is_public=is_public,
@@ -178,11 +187,16 @@ def list_complaints(
     submitter_id: str | None = None,
     assigned_caretaker_id: str | None = None,
     exclude_merged: bool = True,
+    current_user: Any = None,
 ) -> tuple[list[Complaint], int]:
     """
     Return paginated list of complaints with total count.
     """
     q = db.query(Complaint)
+
+    if current_user:
+        from src.utils.hostel_rules import apply_hostel_filter_to_query
+        q = apply_hostel_filter_to_query(q, current_user, Complaint)
 
     if not include_private:
         q = q.filter(Complaint.is_public == True)
@@ -198,9 +212,21 @@ def list_complaints(
     if category:
         q = q.filter(Complaint.category == category)
     if hostel:
-        q = q.filter(Complaint.hostel == hostel)
+        from src.utils.hostel_rules import normalize_hostel
+        norm_h = normalize_hostel(hostel)
+        if norm_h == "CV Raman":
+            from sqlalchemy import or_
+            q = q.filter(
+                or_(
+                    Complaint.hostel.ilike("CV Raman"),
+                    Complaint.hostel.ilike("CVR"),
+                    Complaint.hostel.ilike("%Raman%"),
+                )
+            )
+        else:
+            q = q.filter(Complaint.hostel.ilike(norm_h))
     if block:
-        q = q.filter(Complaint.block == block)
+        q = q.filter(Complaint.block.ilike(f"%{block.strip()}%"))
     if status:
         q = q.filter(Complaint.status == status)
     if priority:

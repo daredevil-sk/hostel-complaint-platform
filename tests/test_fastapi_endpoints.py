@@ -45,7 +45,7 @@ def test_full_migration_flow():
     print("[PASS] Student authenticated successfully")
 
     # 4. Login as caretaker
-    res = client.post("/api/auth/login", json={"email": "caretaker@demo.teamr", "password": "demo1234"})
+    res = client.post("/api/auth/login", json={"email": "asima_caretaker@iitp.ac.in", "password": "caretaker123"})
     assert res.status_code == 200
     caretaker_token = res.json()["token"]
     caretaker_headers = {"Authorization": f"Bearer {caretaker_token}"}
@@ -73,8 +73,8 @@ def test_full_migration_flow():
             "title": "Migrated Test Complaint",
             "description": "Testing the new FastAPI + React stack with anonymous submission.",
             "category": "Plumbing",
-            "hostel": "Aryabhatta",
-            "block": "Block B",
+            "hostel": "Asima",
+            "block": "",
             "floor": "3rd Floor",
             "location_detail": "Room 312 washroom",
             "is_anonymous": "true",

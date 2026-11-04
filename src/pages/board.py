@@ -18,9 +18,14 @@ PAGE_SIZE = 10
 
 
 def render():
+    user = get_current_user()
+    role = get_role()
     back_button("Home", "home", "board_back")
     page_header("Complaint Board",
                 "Browse and support hostel grievances raised by the community.")
+
+    if user and role != UserRole.admin:
+        st.info(f"🏛️ Showing issues for your assigned hostel: **{user.hostel or 'Hostel'}** {f'({user.block})' if getattr(user, 'block', None) else ''}")
 
     # ─── Filters ──────────────────────────────────────────────────────────────
     with st.expander("Search & Filters", expanded=True):
@@ -42,7 +47,11 @@ def render():
             sel_category = st.selectbox("Category", ["All"] +
                                         [c.value for c in Category])
         with f2:
-            sel_hostel = st.selectbox("Hostel", ["All"] + HOSTELS[1:])
+            if user and role != UserRole.admin:
+                st.text_input("Hostel", value=user.hostel or "All", disabled=True, key="board_hostel_locked")
+                sel_hostel = user.hostel or "All"
+            else:
+                sel_hostel = st.selectbox("Hostel", ["All"] + HOSTELS[1:], key="board_hostel_select")
         with f3:
             sel_status = st.selectbox("Status", ["All"] +
                                       [s.value for s in ComplaintStatus])
@@ -70,6 +79,7 @@ def render():
             page=st.session_state["board_page"],
             page_size=PAGE_SIZE,
             include_private=False,
+            current_user=user,
         )
 
         total_pages = max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE)
@@ -116,6 +126,6 @@ def render():
             st.rerun()
     elif not is_logged_in():
         st.info("Sign in to submit complaints, add your support, or comment on issues.")
-        if st.button("Sign In", type="primary", use_container_width=True):
+        if st.button("Sign In", type="primary", use_container_width=True, key="board_signin_btn"):
             st.session_state["page"] = "login"
             st.rerun()
