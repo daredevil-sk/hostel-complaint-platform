@@ -148,9 +148,10 @@ def _ensure_primary_accounts():
 
     db = SessionLocal()
     try:
-        # 1. Primary Caretakers
+        # 1. Primary Caretakers & Wardens
         caretaker_profiles = {}
         for email, data in PRIMARY_CARETAKERS.items():
+            acc_pwd = data.get("password", DEFAULT_CARETAKER_PASSWORD)
             try:
                 p = db.query(Profile).filter(Profile.email == email).first()
                 if not p:
@@ -158,7 +159,7 @@ def _ensure_primary_accounts():
                         id=str(uuid.uuid4()),
                         email=email,
                         display_name=data["display_name"],
-                        password_hash=hash_password(DEFAULT_CARETAKER_PASSWORD),
+                        password_hash=hash_password(acc_pwd),
                         role=UserRole.caretaker,
                         hostel=data["hostel"],
                         gender=data["gender"],
@@ -175,11 +176,11 @@ def _ensure_primary_accounts():
                     p.role = UserRole.caretaker
                     p.is_active = True
                     # Re-hash password if needed or ensure it's valid
-                    p.password_hash = hash_password(DEFAULT_CARETAKER_PASSWORD)
+                    p.password_hash = hash_password(acc_pwd)
                     db.flush()
                 caretaker_profiles[email] = p
             except Exception as e:
-                logger.error(f"Error ensuring caretaker {email}: {e}")
+                logger.error(f"Error ensuring caretaker/warden {email}: {e}")
 
         # 2. Admin accounts
         try:

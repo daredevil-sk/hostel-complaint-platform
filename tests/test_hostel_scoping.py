@@ -98,6 +98,41 @@ def test_caretaker_scoping(db):
     assert can_user_access_complaint(admin, "CV Raman", "") is True
 
 
+def test_warden_scoping(db):
+    w_kalam = Profile(id="w-kalam", email="kalam_warden@iitp.ac.in", display_name="Kalam Warden", password_hash="x", role=UserRole.caretaker, hostel="Kalam")
+    w_asima = Profile(id="w-asima", email="asima_warden@iitp.ac.in", display_name="Asima Warden", password_hash="x", role=UserRole.caretaker, hostel="Asima")
+    w_ary_girls = Profile(id="w-ary-g", email="aryabhatta_girls_warden@iitp.ac.in", display_name="Ary Girls Warden", password_hash="x", role=UserRole.caretaker, hostel="Aryabhatta")
+    w_ary_boys = Profile(id="w-ary-b", email="aryabhatta_warden@iitp.ac.in", display_name="Ary Boys Warden", password_hash="x", role=UserRole.caretaker, hostel="Aryabhatta")
+    w_cvr = Profile(id="w-cvr", email="cvr_warden@iitp.ac.in", display_name="CVR Warden", password_hash="x", role=UserRole.caretaker, hostel="CV Raman")
+
+    for u in [w_kalam, w_asima, w_ary_girls, w_ary_boys, w_cvr]:
+        db.add(u)
+    db.commit()
+
+    # Kalam warden
+    assert can_user_access_complaint(w_kalam, "Kalam", "Block A") is True
+    assert can_user_access_complaint(w_kalam, "Asima", "") is False
+
+    # Asima warden
+    assert can_user_access_complaint(w_asima, "Asima", "") is True
+    assert can_user_access_complaint(w_asima, "Kalam", "Block A") is False
+
+    # Aryabhatta Girls warden (Block C only)
+    assert can_user_access_complaint(w_ary_girls, "Aryabhatta", "Block C") is True
+    assert can_user_access_complaint(w_ary_girls, "Aryabhatta", "Block A") is False
+
+    # Aryabhatta Boys warden (Blocks A, B, D only)
+    assert can_user_access_complaint(w_ary_boys, "Aryabhatta", "Block A") is True
+    assert can_user_access_complaint(w_ary_boys, "Aryabhatta", "Block B") is True
+    assert can_user_access_complaint(w_ary_boys, "Aryabhatta", "Block D") is True
+    assert can_user_access_complaint(w_ary_boys, "Aryabhatta", "Block C") is False
+
+    # CV Raman warden
+    assert can_user_access_complaint(w_cvr, "CV Raman", "") is True
+    assert can_user_access_complaint(w_cvr, "CVR", "") is True
+    assert can_user_access_complaint(w_cvr, "Kalam", "") is False
+
+
 def test_student_scoping_and_list_complaints(db):
     admin = Profile(id="admin-1", email="admin@iitp.ac.in", display_name="Admin", password_hash="x", role=UserRole.admin)
     student_kalam = Profile(id="stu-kalam", email="boy_kalam@iitp.ac.in", display_name="Kalam Boy", password_hash="x", role=UserRole.student, gender="Male", hostel="Kalam", block="Block B")

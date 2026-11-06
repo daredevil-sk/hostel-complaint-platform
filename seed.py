@@ -153,6 +153,73 @@ def seed():
             created_at=now - timedelta(days=30),
             updated_at=now - timedelta(days=30),
         )
+
+        # ─── Wardens (Same Caretaker Role & Scoped Access) ───
+        w_kalam = Profile(
+            id=str(uuid.uuid4()),
+            email="kalam_warden@iitp.ac.in",
+            display_name="Kalam Hostel Warden",
+            password_hash=hash_password("warden123"),
+            role=UserRole.caretaker,
+            hostel="Kalam",
+            gender="Boys",
+            block="Block A,Block B,Block C,Block D",
+            is_active=True,
+            created_at=now - timedelta(days=30),
+            updated_at=now - timedelta(days=30),
+        )
+        w_asima = Profile(
+            id=str(uuid.uuid4()),
+            email="asima_warden@iitp.ac.in",
+            display_name="Asima Hostel Warden",
+            password_hash=hash_password("warden123"),
+            role=UserRole.caretaker,
+            hostel="Asima",
+            gender="Girls",
+            block="",
+            is_active=True,
+            created_at=now - timedelta(days=30),
+            updated_at=now - timedelta(days=30),
+        )
+        w_aryabhatta_girls = Profile(
+            id=str(uuid.uuid4()),
+            email="aryabhatta_girls_warden@iitp.ac.in",
+            display_name="Aryabhatta Girls Warden",
+            password_hash=hash_password("warden123"),
+            role=UserRole.caretaker,
+            hostel="Aryabhatta",
+            gender="Girls",
+            block="Block C",
+            is_active=True,
+            created_at=now - timedelta(days=30),
+            updated_at=now - timedelta(days=30),
+        )
+        w_aryabhatta = Profile(
+            id=str(uuid.uuid4()),
+            email="aryabhatta_warden@iitp.ac.in",
+            display_name="Aryabhatta Boys Warden",
+            password_hash=hash_password("warden123"),
+            role=UserRole.caretaker,
+            hostel="Aryabhatta",
+            gender="Boys",
+            block="Block A,Block B,Block D",
+            is_active=True,
+            created_at=now - timedelta(days=30),
+            updated_at=now - timedelta(days=30),
+        )
+        w_cvr = Profile(
+            id=str(uuid.uuid4()),
+            email="cvr_warden@iitp.ac.in",
+            display_name="CV Raman (CVR) Warden",
+            password_hash=hash_password("warden123"),
+            role=UserRole.caretaker,
+            hostel="CV Raman",
+            gender="Boys",
+            block="",
+            is_active=True,
+            created_at=now - timedelta(days=30),
+            updated_at=now - timedelta(days=30),
+        )
         student1 = Profile(
             id=str(uuid.uuid4()),
             email="student1@demo.teamr",
@@ -218,7 +285,12 @@ def seed():
             created_at=now - timedelta(days=7),
             updated_at=now - timedelta(days=7),
         )
-        for u in [admin, caretaker, ct_kalam, ct_asima, ct_aryabhatta_girls, ct_aryabhatta, ct_cvr, student1, student2, student3, student4, student5]:
+        for u in [
+            admin, caretaker,
+            ct_kalam, ct_asima, ct_aryabhatta_girls, ct_aryabhatta, ct_cvr,
+            w_kalam, w_asima, w_aryabhatta_girls, w_aryabhatta, w_cvr,
+            student1, student2, student3, student4, student5,
+        ]:
             db.add(u)
         db.flush()
 

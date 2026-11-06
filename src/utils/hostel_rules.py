@@ -17,12 +17,14 @@ from typing import Optional, Dict, Any, List
 from sqlalchemy import or_, and_, not_
 
 PRIMARY_CARETAKERS = {
+    # ── Primary Caretakers ──
     "kalam_caretaker@iitp.ac.in": {
         "display_name": "Kalam Hostel Caretaker",
         "hostel": "Kalam",
         "gender": "Boys",
         "blocks": ["Block A", "Block B", "Block C", "Block D"],
         "description": "Caretaker for APJ Abdul Kalam Hostel (Blocks A, B, C, D)",
+        "password": "caretaker123",
     },
     "asima_caretaker@iitp.ac.in": {
         "display_name": "Asima Hostel Caretaker",
@@ -30,6 +32,7 @@ PRIMARY_CARETAKERS = {
         "gender": "Girls",
         "blocks": ["All Blocks"],
         "description": "Caretaker for Asima Girls Hostel",
+        "password": "caretaker123",
     },
     "aryabhatta_girls_caretaker@iitp.ac.in": {
         "display_name": "Aryabhatta Girls Caretaker",
@@ -37,6 +40,7 @@ PRIMARY_CARETAKERS = {
         "gender": "Girls",
         "blocks": ["Block C"],
         "description": "Caretaker for Aryabhatta Girls Hostel (Block C)",
+        "password": "caretaker123",
     },
     "aryabhatta_caretaker@iitp.ac.in": {
         "display_name": "Aryabhatta Boys Caretaker",
@@ -44,6 +48,7 @@ PRIMARY_CARETAKERS = {
         "gender": "Boys",
         "blocks": ["Block A", "Block B", "Block D"],
         "description": "Caretaker for Aryabhatta Boys Hostel (Blocks A, B, D)",
+        "password": "caretaker123",
     },
     "cvr_caretaker@iitp.ac.in": {
         "display_name": "CV Raman (CVR) Caretaker",
@@ -51,10 +56,54 @@ PRIMARY_CARETAKERS = {
         "gender": "Boys",
         "blocks": ["All Blocks"],
         "description": "Caretaker for CV Raman (CVR) Boys Hostel",
+        "password": "caretaker123",
+    },
+
+    # ── Primary Wardens (Same Caretaker Role & Scoped Access) ──
+    "kalam_warden@iitp.ac.in": {
+        "display_name": "Kalam Hostel Warden",
+        "hostel": "Kalam",
+        "gender": "Boys",
+        "blocks": ["Block A", "Block B", "Block C", "Block D"],
+        "description": "Warden for APJ Abdul Kalam Hostel (Blocks A, B, C, D)",
+        "password": "warden123",
+    },
+    "asima_warden@iitp.ac.in": {
+        "display_name": "Asima Hostel Warden",
+        "hostel": "Asima",
+        "gender": "Girls",
+        "blocks": ["All Blocks"],
+        "description": "Warden for Asima Girls Hostel",
+        "password": "warden123",
+    },
+    "aryabhatta_girls_warden@iitp.ac.in": {
+        "display_name": "Aryabhatta Girls Warden",
+        "hostel": "Aryabhatta",
+        "gender": "Girls",
+        "blocks": ["Block C"],
+        "description": "Warden for Aryabhatta Girls Hostel (Block C)",
+        "password": "warden123",
+    },
+    "aryabhatta_warden@iitp.ac.in": {
+        "display_name": "Aryabhatta Boys Warden",
+        "hostel": "Aryabhatta",
+        "gender": "Boys",
+        "blocks": ["Block A", "Block B", "Block D"],
+        "description": "Warden for Aryabhatta Boys Hostel (Blocks A, B, D)",
+        "password": "warden123",
+    },
+    "cvr_warden@iitp.ac.in": {
+        "display_name": "CV Raman (CVR) Warden",
+        "hostel": "CV Raman",
+        "gender": "Boys",
+        "blocks": ["All Blocks"],
+        "description": "Warden for CV Raman (CVR) Boys Hostel",
+        "password": "warden123",
     },
 }
 
 DEFAULT_CARETAKER_PASSWORD = "caretaker123"
+DEFAULT_WARDEN_PASSWORD = "warden123"
 DEFAULT_ADMIN_PASSWORD = "admin1234"
 
 BOYS_HOSTEL_OPTIONS = [
@@ -187,15 +236,15 @@ def can_user_access_complaint(user, complaint_hostel: str, complaint_block: Opti
     email = (getattr(user, "email", "") or "").lower()
 
     if role_val == "caretaker":
-        if email == "kalam_caretaker@iitp.ac.in":
+        if email in ("kalam_caretaker@iitp.ac.in", "kalam_warden@iitp.ac.in"):
             return norm_ch == "Kalam"
-        if email == "asima_caretaker@iitp.ac.in":
+        if email in ("asima_caretaker@iitp.ac.in", "asima_warden@iitp.ac.in"):
             return norm_ch == "Asima"
-        if email == "cvr_caretaker@iitp.ac.in":
+        if email in ("cvr_caretaker@iitp.ac.in", "cvr_warden@iitp.ac.in"):
             return norm_ch == "CV Raman"
-        if email == "aryabhatta_girls_caretaker@iitp.ac.in":
+        if email in ("aryabhatta_girls_caretaker@iitp.ac.in", "aryabhatta_girls_warden@iitp.ac.in"):
             return norm_ch == "Aryabhatta" and is_block_c(norm_cb)
-        if email == "aryabhatta_caretaker@iitp.ac.in":
+        if email in ("aryabhatta_caretaker@iitp.ac.in", "aryabhatta_warden@iitp.ac.in"):
             return norm_ch == "Aryabhatta" and not is_block_c(norm_cb)
         # Fallback to user's assigned hostel if custom caretaker
         user_h = normalize_hostel(getattr(user, "hostel", ""))
@@ -266,11 +315,11 @@ def apply_hostel_filter_to_query(query, user, complaint_cls):
     email = (getattr(user, "email", "") or "").lower()
 
     if role_val == "caretaker":
-        if email == "kalam_caretaker@iitp.ac.in":
+        if email in ("kalam_caretaker@iitp.ac.in", "kalam_warden@iitp.ac.in"):
             return query.filter(complaint_cls.hostel.ilike("Kalam"))
-        if email == "asima_caretaker@iitp.ac.in":
+        if email in ("asima_caretaker@iitp.ac.in", "asima_warden@iitp.ac.in"):
             return query.filter(complaint_cls.hostel.ilike("Asima"))
-        if email == "cvr_caretaker@iitp.ac.in":
+        if email in ("cvr_caretaker@iitp.ac.in", "cvr_warden@iitp.ac.in"):
             return query.filter(
                 or_(
                     complaint_cls.hostel.ilike("CV Raman"),
@@ -278,14 +327,14 @@ def apply_hostel_filter_to_query(query, user, complaint_cls):
                     complaint_cls.hostel.ilike("%Raman%"),
                 )
             )
-        if email == "aryabhatta_girls_caretaker@iitp.ac.in":
+        if email in ("aryabhatta_girls_caretaker@iitp.ac.in", "aryabhatta_girls_warden@iitp.ac.in"):
             return query.filter(
                 and_(
                     complaint_cls.hostel.ilike("Aryabhatta"),
                     sql_is_block_c(complaint_cls),
                 )
             )
-        if email == "aryabhatta_caretaker@iitp.ac.in":
+        if email in ("aryabhatta_caretaker@iitp.ac.in", "aryabhatta_warden@iitp.ac.in"):
             return query.filter(
                 and_(
                     complaint_cls.hostel.ilike("Aryabhatta"),

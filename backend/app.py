@@ -161,6 +161,8 @@ class CreateUserRequest(BaseModel):
 def api_login(req: LoginRequest, db: Session = Depends(get_db)):
     try:
         email = req.email.strip().lower()
+        if "@" not in email:
+            email = f"{email}@iitp.ac.in"
         user = db.query(Profile).filter(Profile.email == email).first()
         if not user or not verify_password(req.password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password.")
@@ -1041,7 +1043,7 @@ def api_health(db: Session = Depends(get_db)):
         c_cols = [c["name"] for c in inspector.get_columns("complaints")] if "complaints" in inspector.get_table_names() else []
         profile_count = db.query(Profile).count()
         caretakers = [
-            {"email": p.email, "hostel": p.hostel, "gender": p.gender, "block": p.block}
+            {"email": p.email, "display_name": p.display_name, "hostel": p.hostel, "gender": p.gender, "block": p.block}
             for p in db.query(Profile).filter(Profile.role == UserRole.caretaker).all()
         ]
         return {
