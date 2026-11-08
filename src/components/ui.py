@@ -88,6 +88,7 @@ def complaint_card(c: Complaint, is_seen: bool = False,
     priority_str = c.priority.value if c.priority else "Medium"
     cat_str = c.category.value if c.category else "Other"
     anon = getattr(c, "is_anonymous", False)
+    demo = getattr(c, "is_demo", False)
     submitter_label = "Anonymous" if anon else ""
 
     with st.container():
@@ -101,6 +102,7 @@ def complaint_card(c: Complaint, is_seen: bool = False,
                 <div style="flex:1;min-width:0;">
                   <span style="font-size:0.73rem;color:#64748B;font-weight:500;
                                letter-spacing:0.05em;">{c.complaint_number}</span>
+                  {"<span style='font-size:0.7rem;color:#F59E0B;border:1px solid rgba(245,158,11,0.3);padding:1px 6px;border-radius:4px;margin-left:8px;'>(demo)</span>" if demo else ""}
                   {"<span style='font-size:0.7rem;color:#FBBF24;margin-left:8px;'>Anonymous</span>" if anon else ""}
                   <h4 style="margin:4px 0 10px 0;color:#E2E8F0;font-size:0.97rem;
                              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">

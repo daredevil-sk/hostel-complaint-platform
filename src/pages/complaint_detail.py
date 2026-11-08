@@ -18,7 +18,7 @@ from src.utils.auth import (
 from src.utils.complaints import (
     get_complaint_by_id, toggle_vote, has_voted, add_comment,
     get_seen_status, mark_seen, acknowledge_complaint, update_status,
-    moderate_comment, ALLOWED_TRANSITIONS,
+    moderate_comment, ALLOWED_TRANSITIONS, delete_complaint,
 )
 from src.components.ui import (
     status_badge, priority_badge, seen_badge, fmt_dt, page_header, back_button,
@@ -82,6 +82,7 @@ def render():
             <div style="padding:12px 0 8px 0;">
               <span style="font-size:0.75rem;color:#64748B;font-weight:500;
                            letter-spacing:0.05em;">{complaint.complaint_number}</span>
+              {"<span style='font-size:0.72rem;color:#F59E0B;margin-left:10px;background:#2a1f0e;border:1px solid rgba(245,158,11,0.3);padding:2px 8px;border-radius:8px;'>(demo)</span>" if getattr(complaint, 'is_demo', False) else ""}
               {"<span style='font-size:0.72rem;color:#FBBF24;margin-left:10px;background:#2a1f0e;padding:2px 8px;border-radius:8px;'>Anonymous</span>" if anon else ""}
               <h2 style="color:#E2E8F0;margin:6px 0 10px 0;font-size:1.4rem;">{complaint.title}</h2>
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
@@ -259,6 +260,20 @@ def render():
                         st.rerun()
                 else:
                     st.info("No further status transitions available.")
+
+            if is_admin():
+                st.markdown("---")
+                st.markdown("#### Admin Moderation")
+                del_confirm = st.checkbox("Confirm deletion of this complaint", key="del_confirm_chk")
+                if st.button("🗑️ Delete / Revoke Complaint", key="adm_del_detail", type="secondary", disabled=not del_confirm):
+                    ok, msg = delete_complaint(db, complaint_id, user.id, role)
+                    if ok:
+                        st.success(msg)
+                        st.session_state["selected_complaint_id"] = None
+                        st.session_state["page"] = "board"
+                        st.rerun()
+                    else:
+                        st.error(msg)
 
             # Student reopen / confirm resolved
             if (is_logged_in() and is_student() and

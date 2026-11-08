@@ -44,6 +44,7 @@ from src.db.models import (
 from src.utils.auth import hash_password
 
 DEMO_LABEL = "[DEMO] "
+DEMO_TAG = "(demo) "
 
 
 def reset_db():
@@ -336,7 +337,7 @@ def seed():
 
         c1 = make_complaint(
             "TR-2026-0001",
-            "Water cooler not working — Kalam Block B common area",
+            DEMO_TAG + "Water cooler not working — Kalam Block B common area",
             Category.water_supply, "Kalam", "Block B", "Ground",
             "Near common room entrance",
             DEMO_LABEL + "The water cooler in Kalam Block B common area has not been functioning "
@@ -347,7 +348,7 @@ def seed():
 
         c2 = make_complaint(
             "TR-2026-0002",
-            "No water supply in 2nd floor washrooms — Asima",
+            DEMO_TAG + "No water supply in 2nd floor washrooms — Asima",
             Category.washroom, "Asima", "Block A", "2nd",
             "Washrooms 201–204 (Girls Wing)",
             DEMO_LABEL + "Water supply has been completely absent in all 2nd floor washrooms in Asima "
@@ -358,7 +359,7 @@ def seed():
 
         c3 = make_complaint(
             "TR-2026-0003",
-            "Broken door hinge — Aryabhatta Block C Room 312",
+            DEMO_TAG + "Broken door hinge — Aryabhatta Block C Room 312",
             Category.furniture, "Aryabhatta", "Block C", "3rd",
             "Room 312 (Girls Wing)",
             DEMO_LABEL + "The door hinge in Aryabhatta Block C room 312 is completely broken. The door cannot "
@@ -368,7 +369,7 @@ def seed():
 
         c4 = make_complaint(
             "TR-2026-0004",
-            "Wi-Fi disconnecting repeatedly in Kalam Block D",
+            DEMO_TAG + "Wi-Fi disconnecting repeatedly in Kalam Block D",
             Category.internet, "Kalam", "Block D", "All",
             "Block D, all floors",
             DEMO_LABEL + "Wi-Fi has been dropping every 10–15 minutes throughout Kalam Block D "
@@ -379,7 +380,7 @@ def seed():
 
         c5 = make_complaint(
             "TR-2026-0005",
-            "Overflowing dustbins near CV Raman mess entrance",
+            DEMO_TAG + "Overflowing dustbins near CV Raman mess entrance",
             Category.cleaning, "CV Raman", "Main Block", "Ground",
             "East walkway near mess entrance",
             DEMO_LABEL + "The dustbins near CV Raman mess entrance have been overflowing for "
@@ -390,7 +391,7 @@ def seed():
 
         c6 = make_complaint(
             "TR-2026-0006",
-            "Flickering lights in corridor — Aryabhatta Block A 3rd floor",
+            DEMO_TAG + "Flickering lights in corridor — Aryabhatta Block A 3rd floor",
             Category.electrical, "Aryabhatta", "Block A", "3rd",
             "Full corridor, 3rd floor (Boys Wing)",
             DEMO_LABEL + "The corridor lights on Aryabhatta Block A 3rd floor have been flickering "

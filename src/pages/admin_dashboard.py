@@ -12,7 +12,7 @@ from src.db.models import (
 from src.utils.auth import require_role, get_current_user, register
 from src.utils.complaints import (
     list_complaints, assign_complaint, update_status, merge_complaints,
-    get_seen_status, get_audit_logs, export_complaints_csv,
+    get_seen_status, get_audit_logs, export_complaints_csv, delete_complaint,
 )
 from src.components.ui import (
     empty_state, page_header, status_badge, priority_badge, fmt_dt, back_button,
@@ -149,7 +149,7 @@ def _render_all_complaints(db, user):
 
     for c in complaints:
         is_seen, ack = get_seen_status(db, c.id)
-        col1, col2, col3 = st.columns([4, 2, 1])
+        col1, col2, col3, col4 = st.columns([4, 2, 1, 1])
         with col1:
             st.markdown(
                 f"**{c.complaint_number}** — {c.title}  \n"
@@ -165,6 +165,14 @@ def _render_all_complaints(db, user):
                 st.session_state["selected_complaint_id"] = c.id
                 st.session_state["page"] = "complaint_detail"
                 st.rerun()
+        with col4:
+            if st.button("🗑️ Delete", key=f"adm_del_{c.id}", help="Revoke accidental or bogus complaint"):
+                ok, msg = delete_complaint(db, c.id, user.id, user.role)
+                if ok:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
         st.markdown("---")
 
 

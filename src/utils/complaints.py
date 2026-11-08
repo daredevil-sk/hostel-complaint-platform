@@ -158,14 +158,22 @@ def delete_complaint(db: Session, complaint_id: str, requester_id: str,
             return False, "You can only delete your own complaints."
         if complaint.status != ComplaintStatus.submitted:
             return False, "You can only delete complaints that are still in 'Submitted' status (not yet acknowledged by a caretaker)."
+    elif requester_role != UserRole.admin:
+        return False, "Unauthorized. Only administrators and submitting students can delete complaints."
 
     try:
+        from src.db.models import Notification
+        db.query(Notification).filter(Notification.complaint_id == complaint_id).delete(synchronize_session=False)
+        db.query(Complaint).filter(Complaint.merged_into_id == complaint_id).update({"merged_into_id": None}, synchronize_session=False)
+
+        complaint_num = complaint.complaint_number
         db.delete(complaint)
         _audit(db, actor_id=requester_id, action="delete_complaint",
                entity_type="complaint", entity_id=complaint_id,
-               metadata={"complaint_number": complaint.complaint_number})
+               metadata={"complaint_number": complaint_num,
+                         "reason": "Revoked/deleted by admin" if requester_role == UserRole.admin else "Deleted by submitter"})
         db.commit()
-        return True, f"Complaint {complaint.complaint_number} deleted."
+        return True, f"Complaint {complaint_num} deleted successfully."
     except Exception as e:
         db.rollback()
         return False, str(e)

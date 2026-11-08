@@ -516,6 +516,19 @@ function BoardPage({ user }) {
 
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+  const handleDelete = async (id) => {
+    try {
+      const res = await api.request(`/complaints/${id}`, { method: 'DELETE' });
+      toast.success(res.message || 'Complaint deleted successfully.');
+      setDeleteConfirmId(null);
+      setComplaints(prev => prev.filter(c => c.id !== id));
+      setTotal(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
   const [hostel, setHostel] = useState('');
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
@@ -725,6 +738,11 @@ function BoardPage({ user }) {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono text-zinc-400">{c.complaint_number}</span>
+                    {c.is_demo && (
+                      <span className="px-1.5 py-0.2 text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded font-medium">
+                        (demo)
+                      </span>
+                    )}
                     {c.is_anonymous && (
                       <span className="px-1.5 py-0.2 text-[10px] bg-zinc-800 text-zinc-300 border border-zinc-700 rounded">
                         Anonymous
@@ -761,12 +779,41 @@ function BoardPage({ user }) {
                   <span className="text-zinc-500 text-[11px]">Updated {c.updated_at}</span>
                 </div>
 
-                <a
-                  href={`#/complaint/${c.id}`}
-                  className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
-                >
-                  View Details →
-                </a>
+                <div className="flex items-center gap-2">
+                  {user?.role === 'admin' && (
+                    deleteConfirmId === c.id ? (
+                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => handleDelete(c.id)}
+                          className="px-2.5 py-1 text-xs bg-rose-600 hover:bg-rose-500 text-white font-medium rounded transition-colors duration-150 shadow-xs"
+                        >
+                          Confirm Delete
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          className="px-2 py-1 text-xs bg-zinc-800 text-zinc-300 hover:bg-zinc-700 rounded transition-colors duration-150"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(c.id); }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs text-rose-400 hover:text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-900/40 hover:border-rose-700/60 rounded transition-colors duration-150"
+                        title="Delete or revoke accidental/bogus complaint (Admin)"
+                      >
+                        <Icons.Trash /> Delete
+                      </button>
+                    )
+                  )}
+
+                  <a
+                    href={`#/complaint/${c.id}`}
+                    className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 border border-zinc-700/60 rounded hover:bg-zinc-800 transition-colors duration-150"
+                  >
+                    View Details →
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -809,7 +856,21 @@ function ComplaintDetailPage({ id, user }) {
   const [ackNotes, setAckNotes] = useState('');
   const [ackDate, setAckDate] = useState('');
   const [photoFile, setPhotoFile] = useState(null);
+  const [showAdminDelete, setShowAdminDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const toast = useToast();
+
+  const handleAdminDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await api.request(`/complaints/${id}`, { method: 'DELETE' });
+      toast.success(res.message || 'Complaint deleted successfully.');
+      window.location.hash = '#/board';
+    } catch (err) {
+      toast.error(err.message);
+      setDeleting(false);
+    }
+  };
 
   const fetchDetail = useCallback(async () => {
     try {
@@ -955,6 +1016,11 @@ function ComplaintDetailPage({ id, user }) {
       <div className="space-y-2 border-b border-zinc-800 pb-5">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono text-zinc-400 font-medium">{complaint.complaint_number}</span>
+          {complaint.is_demo && (
+            <span className="px-1.5 py-0.5 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded font-medium">
+              (demo)
+            </span>
+          )}
           {complaint.is_anonymous && (
             <span className="px-1.5 py-0.5 text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 rounded">
               Anonymous Submission
@@ -1146,6 +1212,48 @@ function ComplaintDetailPage({ id, user }) {
                 <div className="p-2.5 bg-emerald-950/30 border border-emerald-800/50 rounded text-xs text-emerald-300 text-center">
                   You confirmed this resolution. Thank you!
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Admin Moderation / Delete Complaint Box */}
+          {user && user.role === 'admin' && (
+            <div className="bg-zinc-900 border border-rose-900/40 rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold uppercase tracking-wider">
+                <Icons.Trash /> Administrative Control
+              </div>
+              <p className="text-xs text-zinc-400">
+                Delete or revoke accidental, bogus, duplicate, or inappropriate complaints.
+              </p>
+              {showAdminDelete ? (
+                <div className="space-y-2 pt-1 border-t border-rose-900/30">
+                  <p className="text-xs text-rose-300 font-medium">
+                    Permanently delete complaint <strong>{complaint.complaint_number}</strong>?
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleAdminDelete}
+                      disabled={deleting}
+                      className="flex-1 py-1.5 px-3 text-xs font-medium bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white rounded transition-colors duration-150"
+                    >
+                      {deleting ? 'Deleting...' : 'Confirm Delete'}
+                    </button>
+                    <button
+                      onClick={() => setShowAdminDelete(false)}
+                      disabled={deleting}
+                      className="py-1.5 px-3 text-xs bg-zinc-800 text-zinc-300 hover:bg-zinc-700 rounded transition-colors duration-150"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAdminDelete(true)}
+                  className="w-full py-1.5 px-3 text-xs font-medium text-rose-400 hover:text-rose-300 bg-rose-950/30 border border-rose-900/50 hover:border-rose-700 rounded transition-colors duration-150 flex items-center justify-center gap-1.5"
+                >
+                  <Icons.Trash /> Delete / Revoke Complaint
+                </button>
               )}
             </div>
           )}
@@ -1679,7 +1787,14 @@ function MyComplaintsPage({ user }) {
               <div key={c.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
                 <div className="flex flex-col sm:flex-row justify-between gap-2">
                   <div className="space-y-1">
-                    <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                      {c.is_demo && (
+                        <span className="px-1.5 py-0.2 text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded font-medium">
+                          (demo)
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                     <div className="flex flex-wrap gap-2 pt-0.5">
                       <StatusBadge status={c.status} />
@@ -1867,7 +1982,14 @@ function CaretakerDashboard({ user }) {
           {currentList.map(c => (
             <div key={c.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div className="space-y-1">
-                <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-zinc-400">{c.complaint_number}</span>
+                  {c.is_demo && (
+                    <span className="px-1.5 py-0.2 text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded font-medium">
+                      (demo)
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">{c.title}</h3>
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={c.status} />
@@ -1906,8 +2028,36 @@ function AdminDashboard({ user }) {
   const [overview, setOverview] = useState(null);
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [complaints, setComplaints] = useState([]);
+  const [compLoading, setCompLoading] = useState(false);
+  const [compSearch, setCompSearch] = useState('');
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+
+  const fetchComplaints = useCallback(async () => {
+    setCompLoading(true);
+    try {
+      const data = await api.request(`/complaints?page_size=100&search=${encodeURIComponent(compSearch)}`);
+      setComplaints(data.complaints);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setCompLoading(false);
+    }
+  }, [compSearch]);
+
+  const handleDeleteComplaint = async (id) => {
+    try {
+      const res = await api.request(`/complaints/${id}`, { method: 'DELETE' });
+      toast.success(res.message || 'Complaint deleted successfully.');
+      setDeleteConfirmId(null);
+      setComplaints(prev => prev.filter(c => c.id !== id));
+      setOverview(prev => prev ? { ...prev, total_complaints: Math.max(0, prev.total_complaints - 1) } : prev);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   const fetchAdminData = useCallback(async () => {
     try {
@@ -1930,6 +2080,12 @@ function AdminDashboard({ user }) {
     fetchAdminData();
   }, [fetchAdminData]);
 
+  useEffect(() => {
+    if (tab === 'complaints') {
+      fetchComplaints();
+    }
+  }, [tab, fetchComplaints]);
+
   if (loading) return <div className="py-12 text-center text-zinc-400 text-xs">Loading admin panel...</div>;
 
   return (
@@ -1943,7 +2099,7 @@ function AdminDashboard({ user }) {
 
       {/* Tabs */}
       <div className="flex border-b border-zinc-800 gap-4 text-xs font-medium">
-        {['overview', 'users', 'audit'].map(t => (
+        {['overview', 'complaints', 'users', 'audit'].map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -1973,13 +2129,125 @@ function AdminDashboard({ user }) {
           </div>
 
           <div className="flex gap-2.5">
+            <button
+              onClick={() => setTab('complaints')}
+              className="px-3.5 py-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded transition-colors duration-150"
+            >
+              Manage & Revoke Complaints ({overview.total_complaints}) →
+            </button>
             <a href="#/board" className="px-3.5 py-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 rounded transition-colors duration-150">
-              Manage All Complaints on Board →
+              View on Public Board →
             </a>
             <a href="#/analytics" className="px-3.5 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors duration-150 shadow-xs">
               View Analytics & Charts →
             </a>
           </div>
+        </div>
+      )}
+
+      {tab === 'complaints' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <input
+              type="text"
+              placeholder="Filter complaints by title, ID, or hostel..."
+              value={compSearch}
+              onChange={(e) => setCompSearch(e.target.value)}
+              className="px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 w-full sm:w-80"
+            />
+            <span className="text-xs text-zinc-400">
+              {complaints.length} complaint{complaints.length !== 1 ? 's' : ''} loaded
+            </span>
+          </div>
+
+          {compLoading ? (
+            <div className="py-12 text-center text-zinc-400 text-xs">Loading complaints...</div>
+          ) : complaints.length === 0 ? (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg py-12 text-center text-zinc-400 text-xs">
+              No complaints match the filter.
+            </div>
+          ) : (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-zinc-950 text-zinc-400 uppercase text-[10px] tracking-wider border-b border-zinc-800">
+                  <tr>
+                    <th className="py-2.5 px-3 font-semibold">Complaint ID</th>
+                    <th className="py-2.5 px-3 font-semibold">Title</th>
+                    <th className="py-2.5 px-3 font-semibold">Hostel</th>
+                    <th className="py-2.5 px-3 font-semibold">Status</th>
+                    <th className="py-2.5 px-3 font-semibold">Priority</th>
+                    <th className="py-2.5 px-3 font-semibold">Created</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800">
+                  {complaints.map(c => (
+                    <tr key={c.id} className="hover:bg-zinc-850/50 transition-colors duration-100">
+                      <td className="py-2.5 px-3 font-mono text-zinc-300">
+                        <div className="flex items-center gap-1.5">
+                          <span>{c.complaint_number}</span>
+                          {c.is_demo && (
+                            <span className="px-1.5 py-0.2 text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded font-medium">
+                              (demo)
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3 text-zinc-100 font-medium max-w-xs truncate" title={c.title}>
+                        {c.title}
+                      </td>
+                      <td className="py-2.5 px-3 text-zinc-300">
+                        {c.hostel} {c.block ? `(${c.block})` : ''}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <StatusBadge status={c.status} />
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <PriorityBadge priority={c.priority} />
+                      </td>
+                      <td className="py-2.5 px-3 text-zinc-500 whitespace-nowrap">
+                        {c.created_at}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={`#/complaint/${c.id}`}
+                            className="px-2 py-1 text-xs text-zinc-300 hover:text-white bg-zinc-800 border border-zinc-700/60 rounded hover:bg-zinc-750 transition-colors duration-150"
+                          >
+                            View
+                          </a>
+                          {deleteConfirmId === c.id ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleDeleteComplaint(c.id)}
+                                className="px-2 py-1 text-xs bg-rose-600 hover:bg-rose-500 text-white font-medium rounded transition-colors duration-150"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="px-1.5 py-1 text-xs bg-zinc-800 text-zinc-300 hover:bg-zinc-700 rounded transition-colors duration-150"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeleteConfirmId(c.id)}
+                              className="px-2 py-1 text-xs text-rose-400 hover:text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-900/40 rounded transition-colors duration-150"
+                              title="Delete / Revoke accidental or bogus complaint"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
