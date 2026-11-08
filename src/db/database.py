@@ -17,7 +17,7 @@ except ImportError:
 
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.pool import StaticPool, NullPool
 
 def normalize_db_url(url: str) -> str:
     """Normalize database URL for SQLAlchemy compatibility."""
@@ -26,6 +26,13 @@ def normalize_db_url(url: str) -> str:
     url = url.strip()
     if url.startswith("postgres://"):
         url = "postgresql://" + url[len("postgres://"):]
+
+    # Supabase connection pooler fix:
+    # Port 5432 on pooler.supabase.com is Session Mode (limited to 15 connections max: EMAXCONNSESSION).
+    # Port 6543 is Transaction Mode (supports high concurrency without session limits).
+    if "pooler.supabase.com:5432" in url:
+        url = url.replace("pooler.supabase.com:5432", "pooler.supabase.com:6543")
+
     if url.startswith("postgresql://"):
         # Auto-detect modern psycopg (v3) vs psycopg2
         try:
@@ -64,15 +71,36 @@ if DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.close()
 else:
-    engine = create_engine(
-        DATABASE_URL,
-        pool_pre_ping=True,
-        pool_size=20,
-        max_overflow=40,
-        pool_timeout=30,
-        pool_recycle=1800,
-        echo=False,
-    )
+    # Check if Supabase or PgBouncer/Supavisor pooler is used
+    is_supabase_pooler = "pooler.supabase.com" in DATABASE_URL or "supabase.co" in DATABASE_URL or ":6543" in DATABASE_URL
+
+    pg_connect_args = {}
+    # Psycopg 3 compatibility with transaction poolers (disable prepared statements)
+    if "psycopg" in DATABASE_URL:
+        pg_connect_args["prepare_threshold"] = None
+
+    if is_supabase_pooler:
+        # Use NullPool for Supabase / external poolers:
+        # Supabase Supavisor already pools connections on the server side.
+        # NullPool ensures the client immediately releases connections and never holds idle slots.
+        engine = create_engine(
+            DATABASE_URL,
+            connect_args=pg_connect_args,
+            poolclass=NullPool,
+            echo=False,
+        )
+    else:
+        # Standard PostgreSQL: use conservative pool to stay within free-tier connection limits
+        engine = create_engine(
+            DATABASE_URL,
+            connect_args=pg_connect_args,
+            pool_pre_ping=True,
+            pool_size=5,
+            max_overflow=5,
+            pool_timeout=30,
+            pool_recycle=1800,
+            echo=False,
+        )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, expire_on_commit=False, bind=engine)
 
