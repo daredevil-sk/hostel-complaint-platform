@@ -23,7 +23,15 @@ from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
-from src.db.database import get_db, init_db
+from src.db.database import SessionLocal, init_db
+
+def get_db():
+    """FastAPI dependency yielding a database session and guaranteeing its closure after request."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 from src.db.models import Profile, Complaint, ComplaintStatus, UserRole, Priority, Category, ComplaintVote
 from src.utils.auth import hash_password, verify_password
 from src.utils.complaints import (
